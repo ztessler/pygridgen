@@ -28,7 +28,7 @@ except ImportError:
 
 try:
     from scipy import special
-except ImportError
+except ImportError:
     special = None
 
 
