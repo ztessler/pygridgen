@@ -422,8 +422,6 @@ else:
     _error_func = special.erf
 
 
-
-
 class _Focus_x(object):
     """Return a transformed, uniform grid, focused in the x-direction
 
@@ -1007,7 +1005,21 @@ class Gridgen(CGrid):
                  newton=True, thin=True, checksimplepoly=True,
                  verbose=False, autogen=True):
 
-        self._libgridgen = np.ctypeslib.load_library('libgridgen.so', '/usr/local/lib')
+        libgridgen_paths = [
+            ('libgridgen', os.path.join(sys.prefix, 'lib')),
+            ('libgridgen', '/usr/local/lib')
+        ]
+
+        for name, path in libgridgen_paths:
+            try:
+                self._libgridgen = np.ctypeslib.load_library(name, path)
+                break
+            except OSError:
+                pass
+            else:
+                print("libgridgen: attempted names/locations")
+                print(libgridgen_paths)
+                raise OSError('Failed to load libgridgen.')
 
         self._libgridgen.gridgen_generategrid2.restype = ctypes.c_void_p
         self._libgridgen.gridnodes_getx.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_double))
