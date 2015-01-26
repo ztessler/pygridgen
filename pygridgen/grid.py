@@ -19,14 +19,6 @@ from matplotlib.mlab import dist_point_to_segment
 from matplotlib.path import Path
 
 try:
-    import pyproj
-except ImportError:
-    try:
-        from mpl_toolkits.basemap import pyproj
-    except ImportError:
-        raise ImportError('pyproj or mpltoolkits-basemap required')
-
-try:
     from scipy import special
 except ImportError:
     special = None
@@ -416,6 +408,8 @@ def _approximate_erf(x):
     guts = -x**2 * (4.0/np.pi + a*x*x) / (1.0 + a*x*x)
     return np.sign(x) * np.sqrt(1.0 - np.exp(guts))
 
+# use the scipy erf implimentation if
+# possible (it's 10x faster)
 if special is None:
     _error_func = _approximate_erf
 else:
@@ -828,11 +822,22 @@ class CGrid_geo(CGrid):
 
 
     def __init__(self, lon, lat, proj, use_gcdist=True, ellipse='WGS84'):
+
+        # try to import pyproj directly or from basemap
+        try:
+            import pyproj
+        except ImportError:
+            from mpl_toolkits.basemap import pyproj
+        else:
+            raise ImportError('pyproj or mpltoolkits-basemap required')
+
+        # project the data
         x, y = proj(lon, lat)
         self.lon_vert = lon
         self.lat_vert = lat
         self.proj = proj
 
+        # projection info
         self.use_gcdist = use_gcdist
         self.ellipse = ellipse
 
@@ -845,6 +850,7 @@ class CGrid_geo(CGrid):
         self.lon_psi, self.lat_psi = self.proj(self.x_psi, self.y_psi,
                                                inverse=True)
 
+        # coriolus?
         self.f = 2.0 * 7.29e-5 * np.cos(self.lat_rho * np.pi / 180.0)
 
     def mask_polygon_geo(lonlat_verts, mask_value=0.0):
@@ -889,7 +895,9 @@ class Gridgen(CGrid):
         to a projected (Cartesian) coordinate system (e.g., UTM, state
         plane).
     nnodes : optional int (default = 14)
-        The number of nodes used in grid generation.
+        The number of nodes used in grid generation. This affects the
+        precision and computation time. A rule of thumb is that this
+        should be equal to or slightly larger than -log10(precision).
     precision : optional float (default = 1.0e-12)
         The precision with which the grid is generated. The default
         value is good for lat/lon coordinate (i.e., smaller magnitudes
@@ -897,12 +905,15 @@ class Gridgen(CGrid):
         working in state plane or UTM grids and you'll typically get
         better performance.
     nppe : optional int (default = 3)
-        ????
-    newtown : optional bool (default = True)
-        Toggles a Newtownian grid?
+        The number of points per internal edge. Lower values will
+        coarsen the image.
+    newton : optional bool (default = True)
+        Toggles the use of Gauss-Newton solver with Broyden update to
+        determine the sigma values of the grid domains. If False simple
+        iterations will be used instead.
     thin : optional bool (default = True)
-        Toggle to True when the grid is generally narrow in one
-        dimension compared to another.
+        Toggle to True when the (some portion of) the grid is generally
+        narrow in one dimension compared to another.
     checksimplepoly : optional bool (default = True)
         Toggles a check to confirm that the boundary inputs form a valid
         geometry.
@@ -917,7 +928,7 @@ class Gridgen(CGrid):
     -------
     >>> import matplotlib.pyplot as plt
     >>> import pygridgen
-    >>> # define the boundary
+    >>> # define the boundary (pentagon)
     >>> x = [0, 1, 2, 1, 0]
     >>> y = [0, 0, 1, 2, 2]
     >>> beta = [1, 1, 0, 1, 1]
@@ -939,6 +950,7 @@ class Gridgen(CGrid):
         if self._gn is not None:
             self._libgridgen.gridnodes_destroy(self._gn)
 
+        # number of boundary points
         nbry = len(self.xbry)
 
         nsigmas = ctypes.c_int(0)
@@ -947,6 +959,7 @@ class Gridgen(CGrid):
         xrect =  ctypes.c_void_p(0)
         yrect = ctypes.c_void_p(0)
 
+        # deal with focus, if present
         if self.focus is None:
             ngrid = ctypes.c_int(0)
             xgrid = ctypes.POINTER(ctypes.c_double)()
@@ -958,6 +971,7 @@ class Gridgen(CGrid):
             xgrid = (ctypes.c_double * xgrid.size)(*xgrid.flatten())
             ygrid = (ctypes.c_double * ygrid.size)(*ygrid.flatten())
 
+        # generate the grid
         self._gn = self._libgridgen.gridgen_generategrid2(
              ctypes.c_int(nbry),
              (ctypes.c_double * nbry)(*self.xbry),
@@ -982,22 +996,21 @@ class Gridgen(CGrid):
              ctypes.byref(xrect),
              ctypes.byref(yrect) )
 
+        # x positions
         x = self._libgridgen.gridnodes_getx(self._gn)
         x = np.asarray([x[0][i] for i in range(self.ny*self.nx)])
         x.shape = (self.ny, self.nx)
 
+        # y positions
         y = self._libgridgen.gridnodes_gety(self._gn)
         y = np.asarray([y[0][i] for i in range(self.ny*self.nx)])
         y.shape = (self.ny, self.nx)
 
+        # mask out invalid values
         if np.any(np.isnan(x)) or np.any(np.isnan(y)):
             x = np.ma.masked_where(np.isnan(x), x)
             y = np.ma.masked_where(np.isnan(y), y)
 
-        # if self.proj is not None:
-        #     lon, lat = self.proj(x, y, inverse=True)
-        #     super(Gridgen, self).__init__(lon, lat, proj=self.proj)
-        # else:
         super(Gridgen, self).__init__(x, y)
 
     def __init__(self, xbry, ybry, beta, shape, ul_idx=0, focus=None,
@@ -1005,6 +1018,7 @@ class Gridgen(CGrid):
                  newton=True, thin=True, checksimplepoly=True,
                  verbose=False, autogen=True):
 
+        # look for the gridgen-c shared object
         libgridgen_paths = [
             ('libgridgen', os.path.join(sys.prefix, 'lib')),
             ('libgridgen', '/usr/local/lib')
@@ -1021,6 +1035,7 @@ class Gridgen(CGrid):
                 print(libgridgen_paths)
                 raise OSError('Failed to load libgridgen.')
 
+        # initialized some variables
         self._libgridgen.gridgen_generategrid2.restype = ctypes.c_void_p
         self._libgridgen.gridnodes_getx.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_double))
         self._libgridgen.gridnodes_gety.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_double))
@@ -1028,12 +1043,21 @@ class Gridgen(CGrid):
         self._libgridgen.gridnodes_getnce2.restype = ctypes.c_int
         self._libgridgen.gridmap_build.restype = ctypes.c_void_p
 
+        # store the boundary inforation
         self.xbry = np.asarray(xbry, dtype='d')
         self.ybry = np.asarray(ybry, dtype='d')
+
+        # project data as necessary
+        self.proj = proj
+        if self.proj is not None:
+            self.xbry, self.ybry = proj(self.xbry, self.ybry)
+
+        # turning point info and check it
         self.beta = np.asarray(beta, dtype='d')
         if self.beta.sum() != 4.0:
             raise ValueError('sum of beta must be 4.0')
 
+        # basic inputs
         self.shape = shape
         self.ny = shape[0]
         self.nx = shape[1]
@@ -1047,12 +1071,10 @@ class Gridgen(CGrid):
         self.checksimplepoly = checksimplepoly
         self.verbose = verbose
 
-        self.proj = proj
-        if self.proj is not None:
-            self.xbry, self.ybry = proj(self.xbry, self.ybry)
-
+        # gridnodes object
         self._gn = None
 
+        # generate grid
         if autogen:
             self.generate_grid()
 
