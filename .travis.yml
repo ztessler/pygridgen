@@ -40,4 +40,4 @@ before_script:
   - ls -al /usr/local/include
 
 script:
-  nosetests
+  nosetests --verbose --with-id

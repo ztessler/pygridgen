@@ -9,6 +9,19 @@ import pygridgen
 
 
 class _gridMixin(object):
+    _options = {
+        'ul_idx': 0,
+        'focus': None,
+        'proj': None,
+        'nnodes': 14,
+        'precision': 1e-12,
+        'nppe': 3,
+        'newton': True,
+        'thin': True,
+        'checksimplepoly': True,
+        'verbose': False,
+        'autogen': True
+    }
 
     @nt.nottest
     def make_grid(self):
@@ -16,6 +29,42 @@ class _gridMixin(object):
                                  **self.options)
 
         return grid
+
+    def test_ny(self):
+        nt.assert_true(hasattr(self.grid, 'ny'))
+        nt.assert_equal(self.grid.ny, self.shape[0])
+
+    def test_nx(self):
+        nt.assert_true(hasattr(self.grid, 'nx'))
+        nt.assert_equal(self.grid.nx, self.shape[1])
+
+    def test_nnodes(self):
+        nt.assert_true(hasattr(self.grid, 'nnodes'))
+        nt.assert_equal(self.grid.nnodes, self.options['nnodes'])
+
+    def test_precision(self):
+        nt.assert_true(hasattr(self.grid, 'precision'))
+        nt.assert_equal(self.grid.precision, self.options['precision'])
+
+    def test_nppe(self):
+        nt.assert_true(hasattr(self.grid, 'nppe'))
+        nt.assert_equal(self.grid.nppe, self.options['nppe'])
+
+    def test_newton(self):
+        nt.assert_true(hasattr(self.grid, 'newton'))
+        nt.assert_equal(self.grid.newton, self.options['newton'])
+
+    def test_thin(self):
+        nt.assert_true(hasattr(self.grid, 'thin'))
+        nt.assert_equal(self.grid.thin, self.options['thin'])
+
+    def test_checksimplepoly(self):
+        nt.assert_true(hasattr(self.grid, 'checksimplepoly'))
+        nt.assert_equal(self.grid.checksimplepoly, self.options['checksimplepoly'])
+
+    def test_verbose(self):
+        nt.assert_true(hasattr(self.grid, 'verbose'))
+        nt.assert_equal(self.grid.verbose, self.options['verbose'])
 
     def test_x(self):
         nt.assert_true(hasattr(self.grid, 'x'))
@@ -88,11 +137,11 @@ class _gridMixin(object):
 
 class test_Grid_basic(_gridMixin):
     def setup(self):
+        self.options = self._options.copy()
         self.x = [0.0, 1.0, 2.0, 1.0, 0.0]
         self.y = [0.0, 0.0, 0.5, 1.0, 1.0]
         self.beta = [1.0, 1.0, 0.0, 1.0, 1.0]
         self.shape = (10, 5)
-        self.options = {'ul_idx': 0}
 
         self.grid = self.make_grid()
 
@@ -217,6 +266,7 @@ class test_Grid_basic(_gridMixin):
 
 class test_Grid_with_focus(_gridMixin):
     def setup(self):
+        self.options = self._options.copy()
         self.x = [0.0, 1.0, 2.0, 1.0, 0.0]
         self.y = [0.0, 0.0, 0.5, 1.0, 1.0]
         self.beta = [1.0, 1.0, 0.0, 1.0, 1.0]
@@ -225,7 +275,7 @@ class test_Grid_with_focus(_gridMixin):
         focus = pygridgen.Focus()
         focus.add_focus_x(0.50, factor=2.0, Rx=3.0)
         focus.add_focus_y(0.75, factor=0.5, Ry=2.0)
-        self.options = {'ul_idx': 0, 'focus': focus}
+        self.options.update({'ul_idx': 0, 'focus': focus})
 
         self.grid = self.make_grid()
 
@@ -340,13 +390,14 @@ class test_Grid_with_focus(_gridMixin):
 
 class test_Grid_with_proj(_gridMixin):
     def setup(self):
+        self.options = self._options.copy()
         self.x = [-122.7, -122.5, -122.1, -121.7, -122.1, -122.3]
         self.y = [44.5, 45.0, 45.5, 45.5, 45.0, 44.5]
         self.beta = [1.0, 1.0, 0.0, 0.0, 1.0, 1.0]
         self.shape = (10, 4)
 
         utm10 = pyproj.Proj(proj='utm', zone=10, ellps='WGS84')
-        self.options = {'ul_idx': 2, 'proj': utm10}
+        self.options.update({'ul_idx': 2, 'proj': utm10})
 
         self.grid = self.make_grid()
 
@@ -485,3 +536,15 @@ class test_Grid_with_proj(_gridMixin):
             projy,
             decimal=2
         )
+
+
+class test_Grid_autogenFalse_Called(test_Grid_basic):
+
+    @nt.nottest
+    def make_grid(self):
+        self.options.update({'autogen': False})
+        grid = pygridgen.Gridgen(self.x, self.y, self.beta, self.shape,
+                                 **self.options)
+
+        grid.generate_grid()
+        return grid
