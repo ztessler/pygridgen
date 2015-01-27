@@ -73,7 +73,6 @@ class _focusComponentMixin(object):
         )
 
 
-
 class test__Focus_x(_focusComponentMixin):
     def setup(self):
         self.pos_attr = 'xo'
@@ -101,3 +100,68 @@ class test__Focus_y(_focusComponentMixin):
 
         self.focused_x, self.focused_y = self.focus(self.x, self.y)
 
+
+class test_Focus(object):
+    def setup(self):
+        self.focus = pygridgen.Focus()
+        self.known_focused_x = numpy.array([
+            [0., 0.148, 0.248, 0.313, 0.446, 0.59, 0.711, 0.796, 0.881, 1.],
+            [0., 0.148, 0.248, 0.313, 0.446, 0.59, 0.711, 0.796, 0.881, 1.],
+            [0., 0.148, 0.248, 0.313, 0.446, 0.59, 0.711, 0.796, 0.881, 1.],
+            [0., 0.148, 0.248, 0.313, 0.446, 0.59, 0.711, 0.796, 0.881, 1.],
+            [0., 0.148, 0.248, 0.313, 0.446, 0.59, 0.711, 0.796, 0.881, 1.],
+            [0., 0.148, 0.248, 0.313, 0.446, 0.59, 0.711, 0.796, 0.881, 1.],
+            [0., 0.148, 0.248, 0.313, 0.446, 0.59, 0.711, 0.796, 0.881, 1.],
+            [0., 0.148, 0.248, 0.313, 0.446, 0.59, 0.711, 0.796, 0.881, 1.],
+            [0., 0.148, 0.248, 0.313, 0.446, 0.59, 0.711, 0.796, 0.881, 1.],
+            [0., 0.148, 0.248, 0.313, 0.446, 0.59, 0.711, 0.796, 0.881, 1.]
+        ])
+
+        self.known_focused_y = numpy.array([
+            [0.   , 0.   , 0.   , 0.   , 0.   , 0.   , 0.   , 0.   , 0.   , 0.   ],
+            [0.142, 0.142, 0.142, 0.142, 0.142, 0.142, 0.142, 0.142, 0.142, 0.142],
+            [0.27 , 0.27 , 0.27 , 0.27 , 0.27 , 0.27 , 0.27 , 0.27 , 0.27 , 0.27 ],
+            [0.377, 0.377, 0.377, 0.377, 0.377, 0.377, 0.377, 0.377, 0.377, 0.377],
+            [0.462, 0.462, 0.462, 0.462, 0.462, 0.462, 0.462, 0.462, 0.462, 0.462],
+            [0.538, 0.538, 0.538, 0.538, 0.538, 0.538, 0.538, 0.538, 0.538, 0.538],
+            [0.623, 0.623, 0.623, 0.623, 0.623, 0.623, 0.623, 0.623, 0.623, 0.623],
+            [0.73 , 0.73 , 0.73 , 0.73 , 0.73 , 0.73 , 0.73 , 0.73 , 0.73 , 0.73 ],
+            [0.858, 0.858, 0.858, 0.858, 0.858, 0.858, 0.858, 0.858, 0.858, 0.858],
+            [1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   ]
+        ])
+
+        self.focus.add_focus_x(0.25, factor=3, Rx=0.1)
+        self.focus.add_focus_x(0.75, factor=2, Rx=0.2)
+        self.focus.add_focus_y(0.50, factor=2, Ry=0.3)
+
+    def test__focuspoints(self):
+        nt.assert_true(hasattr(self.focus, '_focuspoints'))
+        nt.assert_true(isinstance(self.focus._focuspoints, list))
+        nt.assert_equal(len(self.focus._focuspoints), 3)
+
+    def test_add_focus_x(self):
+        self.focus.add_focus_x(0.99, factor=3, Rx=0.1)
+        nt.assert_true(len(self.focus._focuspoints), 4)
+        nt.assert_true(isinstance(self.focus._focuspoints[-1], pygridgen.grid._Focus_x))
+        nt.assert_equal(self.focus._focuspoints[-1].xo, 0.99)
+
+    def test_add_focus_y(self):
+        self.focus.add_focus_y(0.99, factor=3, Ry=0.1)
+        nt.assert_true(len(self.focus._focuspoints), 4)
+        nt.assert_true(isinstance(self.focus._focuspoints[-1], pygridgen.grid._Focus_y))
+        nt.assert_equal(self.focus._focuspoints[-1].yo, 0.99)
+
+    @nt.nottest
+    def do_call(self):
+        _x = numpy.linspace(0, 1, num=10)
+        _y = numpy.linspace(0, 1, num=10)
+        x, y = numpy.meshgrid(_x, _y)
+        return self.focus(x, y)
+
+    def test_focused_x(self):
+        xf, yf = self.do_call()
+        nptest.assert_array_almost_equal(xf, self.known_focused_x, decimal=3)
+
+    def test_focused_y(self):
+        xf, yf = self.do_call()
+        nptest.assert_array_almost_equal(yf, self.known_focused_y, decimal=3)
