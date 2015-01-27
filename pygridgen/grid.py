@@ -408,59 +408,7 @@ def _approximate_erf(x):
     return np.sign(x) * np.sqrt(1.0 - np.exp(guts))
 
 
-class _Focus_x(object):
-    """Return a transformed, uniform grid, focused in the x-direction
-
-    This class may be called with a uniform grid, with limits from
-    [0, 1], to create a focused grid in the x-directions centered about
-    ``xo``. The output grid is also uniform from [0, 1] in both x and y.
-
-    Parameters
-    ----------
-    xo : float
-        Location about which to focus grid
-    factor : float
-        Amount to focus grid. Creates cell sizes that are factor smaller
-        (factor > 1) or larger (factor < 1) in the focused region.
-    Rx : float
-        Lateral extent of focused region, similar to a lateral spatial
-        scale for the focusing region.
-
-    Returns
-    -------
-    foc : class
-        The class may be called with arguments of a grid. The returned
-        transformed grid (x, y) will be focused as per the parameters
-        listed above.
-    """
-
-    def __init__(self, xo, factor=2.0, Rx=0.1):
-        self.xo = xo
-        self.factor = factor
-        self.Rx = Rx
-
-    def __call__(self, x, y):
-        x = np.asarray(x)
-        y = np.asarray(y)
-
-        if np.any(x > 1.0) or np.any(x < 0.0):
-            raise ValueError('x must be within the range [0, 1]')
-
-        if np.any(y > 1.0) or np.any(y < 0.0):
-                raise ValueError('y must be within the range [0, 1]')
-
-        alpha = 1.0 - 1.0/self.factor
-
-        def xf(x):
-            return x - 0.5*( np.sqrt(np.pi)*self.Rx*alpha
-                            *_approximate_erf((x-self.xo)/self.Rx) )
-
-        xf0 = xf(0.0); xf1 = xf(1.0)
-
-        return (xf(x)-xf0)/(xf1-xf0), y
-
-
-class _Focus_y(object):
+class _FocusPoint(object):
     """Return a transformed, uniform grid, focused in the y-direction
 
     This class may be called with a uniform grid, with limits from
@@ -469,12 +417,14 @@ class _Focus_y(object):
 
     Parameters
     ----------
-    yo : float
+    pos : float
         Location about which to focus grid
+    axis : string ('x' or 'y')
+        Axis along which the grid will be focused.
     factor : float
         Amount to focus grid. Creates cell sizes that are factor smaller
         (factor > 1) or larger (factor < 1) in the focused region.
-    Ry : float
+    extent : float
         Lateral extent of focused region, similar to a lateral spatial
         scale for the focusing region.
 
@@ -487,30 +437,40 @@ class _Focus_y(object):
 
     """
 
-    def __init__(self, yo, factor=2.0, Ry=0.1):
-        self.yo = yo
+    def __init__(self, pos, axis, factor, extent):
+        self.pos = pos
+        self.axis = axis.lower()
         self.factor = factor
-        self.Ry = Ry
+        self.extent = extent
+
+        if self.pos > 1.0 or self.pos < 0:
+            raise ValueError('`pos` must be within the range [0, 1]')
+
+        if self.axis not in ['x', 'y']:
+            raise ValueError("`axis` must be 'x' or 'y'")
+
+    def _reposition_point(self, pnt):
+        alpha = 1.0 - 1.0 / self.factor
+        erf = _approximate_erf((pnt-self.pos) / self.extent)
+        return pnt - 0.5 * (np.sqrt(np.pi) * self.extent * alpha * erf)
+
+    def _do_focus(self, array):
+
+        f0 = self._reposition_point(0.0)
+        f1 = self._reposition_point(1.0)
+        return (self._reposition_point(array) - f0) / (f1 - f0)
 
     def __call__(self, x, y):
-        x = np.asarray(x)
-        y = np.asarray(y)
-
         if np.any(x > 1.0) or np.any(x < 0.0):
             raise ValueError('x must be within the range [0, 1]')
 
         if np.any(y > 1.0) or np.any(y < 0.0):
                 raise ValueError('y must be within the range [0, 1]')
 
-        alpha = 1.0 - 1.0/self.factor
-
-        def yf(y):
-            return y - 0.5*( np.sqrt(np.pi)*self.Ry*alpha
-                            *_approximate_erf((y-self.yo)/self.Ry) )
-
-        yf0 = yf(0.0); yf1 = yf(1.0)
-
-        return x, (yf(y)-yf0)/(yf1-yf0)
+        if self.axis == 'y':
+            return x, self._do_focus(y)
+        elif self.axis == 'x':
+            return self._do_focus(x), y
 
 
 class Focus(object):
@@ -578,7 +538,7 @@ class Focus(object):
             Lateral extent of focused region, similar to a lateral
             spatial scale for the focusing region.
         """
-        self._focuspoints.append(_Focus_x(xo, factor, Rx))
+        self._focuspoints.append(_FocusPoint(xo, 'x', factor, Rx))
 
     def add_focus_y(self, yo, factor=2.0, Ry=0.1):
         """Add a focused y-location
@@ -597,7 +557,7 @@ class Focus(object):
             Lateral extent of focused region, similar to a lateral spatial
             scale for the focusing region.
         """
-        self._focuspoints.append(_Focus_y(yo, factor, Ry))
+        self._focuspoints.append(_FocusPoint(yo, 'y', factor, Ry))
 
     def __call__(self, x, y):
         """docstring for __call__"""
