@@ -18,14 +18,6 @@ from matplotlib.lines import Line2D
 from matplotlib.mlab import dist_point_to_segment
 from matplotlib.path import Path
 
-try:
-    import pyproj
-except ImportError:
-    try:
-        from mpl_toolkits.basemap import pyproj
-    except ImportError:
-        raise ImportError('pyproj or mpltoolkits-basemap required')
-
 
 def points_inside_poly(points, verts):
     poly = Path(verts)
@@ -838,6 +830,12 @@ class CGrid_geo(CGrid):
 
     """
     def _calculate_metrics(self):
+        try:
+            import pyproj
+        except ImportError:
+            from mpl_toolkits.basemap import pyproj
+        else:
+            raise ImportError('pyproj or mpltoolkits-basemap required')
 
         # calculate metrics based on x and y grid
         super(CGrid_geo, self)._calculate_metrics()
@@ -846,14 +844,14 @@ class CGrid_geo(CGrid):
         # for more accurate cell sizes.
         if self.use_gcdist:
             geod = pyproj.Geod(ellps=self.ellipse)
-            az1, az2, dx = geod.inv(self.lon[:,1:],  self.lat[:,1:], \
+            az1, az2, dx = geod.inv(self.lon[:,1:], self.lat[:,1:],
                                     self.lon[:,:-1], self.lat[:,:-1])
-            self.dx = 0.5*(dx[1:,:]+dx[:-1,:])
-            self.pm = 1.0/self.dx
-            az1, ax2, dy = geod.inv(self.lon[1:,:],  self.lat[1:,:], \
-                                   self.lon[:-1,:], self.lat[:-1,:])
-            self.dy = 0.5*(dy[:,1:]+dy[:,:-1])
-            self.pn = 1.0/self.dy
+            self.dx = 0.5 * (dx[1:,:] + dx[:-1,:])
+            self.pm = 1.0 / self.dx
+            az1, ax2, dy = geod.inv(self.lon[1:,:], self.lat[1:,:],
+                                    self.lon[:-1,:], self.lat[:-1,:])
+            self.dy = 0.5 * (dy[:,1:] + dy[:,:-1])
+            self.pn = 1.0 / self.dy
 
 
     def __init__(self, lon, lat, proj, use_gcdist=True, ellipse='WGS84'):
