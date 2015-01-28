@@ -540,7 +540,7 @@ class Focus(object):
     EXAMPLES
     --------
 
-    >>> foc = pygridgen.grid.Focus()
+    >>> foc = pygridgen.Focus()
     >>> foc.add_focus_x(0.2, factor=3.0, Rx=0.2)
     >>> foc.add_focus_y(0.6, factor=5.0, Ry=0.35)
 
