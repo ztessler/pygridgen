@@ -944,6 +944,9 @@ class Gridgen(CGrid):
     verbose : optional bool (default = True)
         Toggles the printing of console statements to track the progress
         of the grid generation.
+    autogen : optional bool (default = True)
+        Toggles the automatic generation of the grid. Set to False if
+        you want to delay calling the ``generate_grid`` method.
 
     Example
     -------
@@ -1039,12 +1042,10 @@ class Gridgen(CGrid):
 
         super(Gridgen, self).__init__(x, y)
 
-
-
-    def __init__(self, xbry, ybry, beta, shape, ul_idx=0, \
-                 focus=None, proj=None, \
-                 nnodes=14, precision=1.0e-12, nppe=3, \
-                 newton=True, thin=True, checksimplepoly=True, verbose=False):
+    def __init__(self, xbry, ybry, beta, shape, ul_idx=0, focus=None,
+                 proj=None, nnodes=14, precision=1.0e-12, nppe=3,
+                 newton=True, thin=True, checksimplepoly=True,
+                 verbose=False, autogen=True):
 
         # find the gridgen-c shared library
         libgridgen_paths = [
@@ -1101,7 +1102,8 @@ class Gridgen(CGrid):
         self._gn = None
 
         # generate the grid
-        self.generate_grid()
+        if autogen:
+            self.generate_grid()
 
     def __del__(self):
         """delete gridnode object upon deletion"""
