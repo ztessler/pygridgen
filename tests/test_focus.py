@@ -5,7 +5,7 @@ import nose.tools as nt
 import pygridgen
 
 
-class _focusComponentMixin(object):
+class _focusPointMixin(object):
     _x = numpy.linspace(0, 1, num=10)
     _y = numpy.linspace(0, 1, num=10)
     x, y = numpy.meshgrid(_x, _y)
@@ -13,6 +13,8 @@ class _focusComponentMixin(object):
     pos = 0.25
     factor = 3
     reach = 0.2
+    pos_attr = 'pos'
+    reach_attr = 'extent'
 
     known_focused = numpy.array([
         [0., 0.106, 0.17, 0.222, 0.307, 0.43, 0.569, 0.712, 0.856, 1.],
@@ -26,6 +28,13 @@ class _focusComponentMixin(object):
         [0., 0.106, 0.17, 0.222, 0.307, 0.43, 0.569, 0.712, 0.856, 1.],
         [0., 0.106, 0.17, 0.222, 0.307, 0.43, 0.569, 0.712, 0.856, 1.]
     ])
+
+    def setup(self):
+        self.main_setup()
+        self.focus = pygridgen.grid._FocusPoint(
+            self.pos, self.axis, self.factor, self.reach
+        )
+        self.focused_x, self.focused_y = self.focus(self.x, self.y)
 
     @nt.raises(ValueError)
     def test_call_bad_x_pos(self):
@@ -72,33 +81,44 @@ class _focusComponentMixin(object):
             self.reach
         )
 
+    @nt.raises(ValueError)
+    def test_badaxis(self):
+        focus = pygridgen.grid._FocusPoint(0.1, 'xjunk', 2, 0.25)
 
-class test__Focus_x(_focusComponentMixin):
-    def setup(self):
-        self.pos_attr = 'xo'
-        self.reach_attr = 'Rx'
-        self.focus = pygridgen.grid._Focus_x(
-            self.pos, factor=self.factor, Rx=self.reach
+    @nt.raises(ValueError)
+    def test_position_positive(self):
+        focus = pygridgen.grid._FocusPoint(1.1, self.axis, 2, 0.25)
+
+    @nt.raises(ValueError)
+    def test_position_negative(self):
+        focus = pygridgen.grid._FocusPoint(-0.1, self.axis, 2, 0.25)
+
+
+class test__Focus_x(_focusPointMixin):
+    @nt.nottest
+    def main_setup(self):
+        self.axis = 'x'
+        self.focus = pygridgen.grid._FocusPoint(
+            self.pos, self.axis, self.factor, self.reach
         )
-
         self.known_focused_x = self.known_focused
-
         self.known_focused_y = self.y.copy()
         self.focused_x, self.focused_y = self.focus(self.x, self.y)
 
 
-class test__Focus_y(_focusComponentMixin):
-    def setup(self):
-        self.pos_attr = 'yo'
-        self.reach_attr = 'Ry'
-        self.focus = pygridgen.grid._Focus_y(
-            self.pos, factor=self.factor, Ry=self.reach
-        )
+class test__Focus_y(_focusPointMixin):
+    @nt.nottest
+    def main_setup(self):
+        self.axis = 'y'
+        self.pos_attr = 'pos'
+        self.reach_attr = 'extent'
+
+
 
         self.known_focused_x = self.x.copy()
         self.known_focused_y = self.known_focused.T
 
-        self.focused_x, self.focused_y = self.focus(self.x, self.y)
+
 
 
 class test_Focus(object):
@@ -142,14 +162,16 @@ class test_Focus(object):
     def test_add_focus_x(self):
         self.focus.add_focus_x(0.99, factor=3, Rx=0.1)
         nt.assert_true(len(self.focus._focuspoints), 4)
-        nt.assert_true(isinstance(self.focus._focuspoints[-1], pygridgen.grid._Focus_x))
-        nt.assert_equal(self.focus._focuspoints[-1].xo, 0.99)
+        nt.assert_true(isinstance(self.focus._focuspoints[-1], pygridgen.grid._FocusPoint))
+        nt.assert_equal(self.focus._focuspoints[-1].pos, 0.99)
+        nt.assert_equal(self.focus._focuspoints[-1].axis, 'x')
 
     def test_add_focus_y(self):
         self.focus.add_focus_y(0.99, factor=3, Ry=0.1)
         nt.assert_true(len(self.focus._focuspoints), 4)
-        nt.assert_true(isinstance(self.focus._focuspoints[-1], pygridgen.grid._Focus_y))
-        nt.assert_equal(self.focus._focuspoints[-1].yo, 0.99)
+        nt.assert_true(isinstance(self.focus._focuspoints[-1], pygridgen.grid._FocusPoint))
+        nt.assert_equal(self.focus._focuspoints[-1].pos, 0.99)
+        nt.assert_equal(self.focus._focuspoints[-1].axis, 'y')
 
     @nt.nottest
     def do_call(self):
