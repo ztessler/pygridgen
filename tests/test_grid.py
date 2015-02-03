@@ -548,3 +548,29 @@ class test_Grid_autogenFalse_Called(test_Grid_basic):
 
         grid.generate_grid()
         return grid
+
+
+
+class test_Grid_regenerate(test_Grid_with_focus):
+    '''Tests grid regenerate with tweaks parameters (properties)
+
+    Starts off with the same parameters as ``test_Grid_with_focus``, but
+    ignores focus and initial generates as grid with a different shape. Then
+    the grid's ``nx``, ``ny``, and ``focus`` properties are set to their
+    correct values and the grid is regenerated. All of the original
+    ``test_Grid_with_focus`` tests are then run.
+
+    '''
+    @nt.nottest
+    def make_grid(self):
+        focus = self.options.pop('focus')
+
+        grid = pygridgen.Gridgen(self.x, self.y, self.beta, (5, 5),
+                                 focus=None, **self.options)
+
+        grid.ny = self.shape[0]
+        grid.nx = self.shape[1]
+        grid.focus = focus
+        grid.generate_grid()
+
+        return grid
