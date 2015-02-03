@@ -939,9 +939,10 @@ class Gridgen(CGrid):
         # number of boundary points
         nbry = len(self.xbry)
 
-        # sigm parameter
-        nsigmas = ctypes.c_int(0)
-        sigmas = ctypes.c_void_p(0)
+        # sigma parameter
+        if self.sigmas is None:
+            self.nsigmas = ctypes.c_int(0)
+            self.sigmas = ctypes.c_void_p(0)
 
         # rectangularized domain
         nrect = ctypes.c_int(0)
@@ -962,28 +963,29 @@ class Gridgen(CGrid):
 
         # call the C-code to make make the grid
         self._gn = self._libgridgen.gridgen_generategrid2(
-             ctypes.c_int(nbry),
-             (ctypes.c_double * nbry)(*self.xbry),
-             (ctypes.c_double * nbry)(*self.ybry),
-             (ctypes.c_double * nbry)(*self.beta),
-             ctypes.c_int(self.ul_idx),
-             ctypes.c_int(self.nx),
-             ctypes.c_int(self.ny),
-             ngrid,
-             xgrid,
-             ygrid,
-             ctypes.c_int(self.nnodes),
-             ctypes.c_int(self.newton),
-             ctypes.c_double(self.precision),
-             ctypes.c_int(self.checksimplepoly),
-             ctypes.c_int(self.thin),
-             ctypes.c_int(self.nppe),
-             ctypes.c_int(self.verbose),
-             ctypes.byref(nsigmas),
-             ctypes.byref(sigmas),
-             ctypes.byref(nrect),
-             ctypes.byref(xrect),
-             ctypes.byref(yrect))
+            ctypes.c_int(nbry),
+            (ctypes.c_double * nbry)(*self.xbry),
+            (ctypes.c_double * nbry)(*self.ybry),
+            (ctypes.c_double * nbry)(*self.beta),
+            ctypes.c_int(self.ul_idx),
+            ctypes.c_int(self.nx),
+            ctypes.c_int(self.ny),
+            ngrid,
+            xgrid,
+            ygrid,
+            ctypes.c_int(self.nnodes),
+            ctypes.c_int(self.newton),
+            ctypes.c_double(self.precision),
+            ctypes.c_int(self.checksimplepoly),
+            ctypes.c_int(self.thin),
+            ctypes.c_int(self.nppe),
+            ctypes.c_int(self.verbose),
+            ctypes.byref(self.nsigmas),
+            ctypes.byref(self.sigmas),
+            ctypes.byref(nrect),
+            ctypes.byref(xrect),
+            ctypes.byref(yrect)
+        )
 
         # x-positions
         x = self._libgridgen.gridnodes_getx(self._gn)
@@ -1044,12 +1046,15 @@ class Gridgen(CGrid):
         if self.beta.sum() != 4.0:
             raise ValueError('sum of beta must be 4.0')
 
-        # other basic inputs
-        self.shape = shape
-        self.ny = shape[0]
-        self.nx = shape[1]
+        # properties
+        self._sigmas = None
+        self._nsigmas = None
+        self._ny = shape[0]
+        self._nx = shape[1]
+        self._focus = focus
+
+        # other inputs
         self.ul_idx = ul_idx
-        self.focus = focus
         self.nnodes = nnodes
         self.precision = precision
         self.nppe = nppe
@@ -1064,6 +1069,46 @@ class Gridgen(CGrid):
         # generate the grid
         if autogen:
             self.generate_grid()
+
+    @property
+    def sigmas(self):
+        return self._sigmas
+    @sigmas.setter
+    def sigmas(self, value):
+        self._sigmas = value
+
+    @property
+    def nsigmas(self):
+        return self._nsigmas
+    @nsigmas.setter
+    def nsigmas(self, value):
+        self._nsigmas = value
+
+    @property
+    def nx(self):
+        return self._nx
+    @nx.setter
+    def nx(self, value):
+        self._nx = value
+
+    @property
+    def ny(self):
+        return self._ny
+    @ny.setter
+    def ny(self, value):
+        self._ny = value
+
+    @property
+    def shape(self):
+        return (self.ny, self.nx)
+
+    @property
+    def focus(self):
+        return self._focus
+    @focus.setter
+    def focus(self, value):
+        self._focus = value
+
 
     def __del__(self):
         """delete gridnode object upon deletion"""
