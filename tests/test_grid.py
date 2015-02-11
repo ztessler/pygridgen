@@ -134,6 +134,15 @@ class _gridMixin(object):
         nptest.assert_array_almost_equal(self.grid.ybry, self.y,
                                          decimal=2)
 
+    def test_sigmas(self):
+        nt.assert_true(hasattr(self.grid, 'sigmas'))
+        nt.assert_true(hasattr(self.grid, 'nsigmas'))
+
+    def test_rect(self):
+        nt.assert_true(hasattr(self.grid, 'xrect'))
+        nt.assert_true(hasattr(self.grid, 'yrect'))
+        nt.assert_true(hasattr(self.grid, 'nrect'))
+
 
 class test_Grid_basic(_gridMixin):
     def setup(self):
