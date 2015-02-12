@@ -945,9 +945,9 @@ class Gridgen(CGrid):
             self.sigmas = ctypes.c_void_p(0)
 
         # rectangularized domain
-        self.nrect = ctypes.c_int(0)
-        self.xrect = ctypes.c_void_p(0)
-        self.yrect = ctypes.c_void_p(0)
+        nrect = ctypes.c_int(0)
+        xrect =  ctypes.c_void_p(0)
+        yrect = ctypes.c_void_p(0)
 
         # focus the grid if necessary
         if self.focus is None:
@@ -982,9 +982,9 @@ class Gridgen(CGrid):
             ctypes.c_int(self.verbose),
             ctypes.byref(self.nsigmas),
             ctypes.byref(self.sigmas),
-            ctypes.byref(self.nrect),
-            ctypes.byref(self.xrect),
-            ctypes.byref(self.yrect)
+            ctypes.byref(nrect),
+            ctypes.byref(xrect),
+            ctypes.byref(yrect)
         )
 
         # x-positions
@@ -1049,9 +1049,6 @@ class Gridgen(CGrid):
         # properties
         self._sigmas = None
         self._nsigmas = None
-        self._xrect = None
-        self._yrect = None
-        self._nrect = None
         self._ny = shape[0]
         self._nx = shape[1]
         self._focus = focus
@@ -1086,28 +1083,6 @@ class Gridgen(CGrid):
     @nsigmas.setter
     def nsigmas(self, value):
         self._nsigmas = value
-
-    @property
-    def xrect(self):
-        return self._xrect
-    @xrect.setter
-    def xrect(self, value):
-        self._xrect = value
-
-    @property
-    def yrect(self):
-        return self._yrect
-    @yrect.setter
-    def yrect(self, value):
-        self._yrect = value
-
-
-    @property
-    def nrect(self):
-        return self._nrect
-    @nrect.setter
-    def nrect(self, value):
-        self._nrect = value
 
     @property
     def nx(self):
