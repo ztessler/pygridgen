@@ -745,7 +745,7 @@ class CGrid(object):
 
         mask = self.mask_rho
         inside = points_inside_poly(
-            np.vstack([self.x_rho.flat, self.y_rho.flat]).T,
+            np.vstack([self.x_rho.flatten(), self.y_rho.flatten()]).T,
             polyverts
         )
         if np.any(inside):

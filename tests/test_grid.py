@@ -151,6 +151,7 @@ class test_Grid_basic(_gridMixin):
         self.y = [0.0, 0.0, 0.5, 1.0, 1.0]
         self.beta = [1.0, 1.0, 0.0, 1.0, 1.0]
         self.shape = (10, 5)
+        self.island = numpy.array([(5, 10), (10, 10), (10, 5), (5, 5)]) / 10.
 
         self.grid = self.make_grid()
 
@@ -271,6 +272,25 @@ class test_Grid_basic(_gridMixin):
             [ 0.12,  0.37,  0.63,  0.88],
             [ 0.12,  0.37,  0.63,  0.88]
         ])
+
+        self.known_mask_rho = numpy.array([
+            [ 1.,  1.,  1.,  1.],
+            [ 1.,  1.,  1.,  0.],
+            [ 1.,  1.,  0.,  0.],
+            [ 1.,  1.,  0.,  0.],
+            [ 1.,  1.,  0.,  0.],
+            [ 1.,  1.,  1.,  1.],
+            [ 1.,  1.,  1.,  1.],
+            [ 1.,  1.,  1.,  1.],
+            [ 1.,  1.,  1.,  1.]
+        ])
+
+    def test_mask_poylgon(self):
+        nt.assert_true(hasattr(self.grid, 'mask_polygon'))
+        self.grid.mask_polygon(self.island)
+        nptest.assert_array_almost_equal(
+            self.known_mask_rho, self.grid.mask_rho
+        )
 
 
 class test_Grid_with_focus(_gridMixin):
