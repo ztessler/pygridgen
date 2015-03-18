@@ -1,6 +1,10 @@
 import numpy
 import matplotlib.pyplot as plt
-import pyproj
+
+try:
+    import pyproj
+except ImportError:
+    from mpl_toolkits.basemap import pyproj
 
 import numpy.testing as nptest
 import nose.tools as nt

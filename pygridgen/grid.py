@@ -6,7 +6,11 @@ import os
 import sys
 import site
 import ctypes
-import cPickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
 from warnings import warn
 from copy import deepcopy
 
@@ -52,10 +56,10 @@ class BoundaryInteractor(object):
 
         bry.dump(bry_file)
             Write the current boundary informtion (bry.x, bry.y, bry.beta) to
-            a cPickle file bry_file.
+            a pickle file bry_file.
 
         bry.load(bry_file)
-            Read in boundary informtion (x, y, beta) from the cPickle file
+            Read in boundary informtion (x, y, beta) from the pickle file
             bry_file.
 
         bry.remove_grid()
@@ -359,7 +363,7 @@ class BoundaryInteractor(object):
     def save_bry(self, bry_file='bry.pickle'):
         f = open(bry_file, 'wb')
         bry_dict = {'x': self.x, 'y': self.y, 'beta': self.beta}
-        cPickle.dump(bry_dict, f, protocol=-1)
+        pickle.dump(bry_dict, f, protocol=-1)
         f.close()
 
     def load_bry(self, bry_file='bry.pickle'):
@@ -376,7 +380,7 @@ class BoundaryInteractor(object):
 
     def save_grid(self, grid_file='grid.pickle'):
         f = open(grid_file, 'wb')
-        cPickle.dump(self.grd, f, protocol=-1)
+        pickle.dump(self.grd, f, protocol=-1)
         f.close()
 
     def _get_verts(self): return zip(self.x, self.y)
@@ -461,6 +465,8 @@ class _FocusPoint(object):
         return (self._reposition_point(array) - f0) / (f1 - f0)
 
     def __call__(self, x, y):
+        x = np.asarray(x)
+        y = np.asarray(y)
         if np.any(x > 1.0) or np.any(x < 0.0):
             raise ValueError('x must be within the range [0, 1]')
 
