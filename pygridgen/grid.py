@@ -412,6 +412,10 @@ class CGrid(object):
         return dx
 
     @property
+    def pm(self):
+        return 1.0 / self.dx
+
+    @property
     def dy(self):
         '''
         dimension of cell in y-direction?
@@ -420,6 +424,10 @@ class CGrid(object):
         y_temp = 0.5*(self.y_vert[:, 1:]+self.y_vert[:, :-1])
         dy = np.sqrt(np.diff(x_temp, axis=0)**2 + np.diff(y_temp, axis=0)**2)
         return dy
+
+    @property
+    def pn(self):
+        return 1.0 / self.dy
 
     @property
     def dndx(self):
@@ -584,7 +592,8 @@ class CGrid_geo(CGrid):
 
 
     """
-    def _calculate_metrics(self):
+
+    def __init__(self, lon, lat, proj, use_gcdist=True, ellipse='WGS84'):
         try:
             import pyproj
         except ImportError:
@@ -592,32 +601,15 @@ class CGrid_geo(CGrid):
         else:
             raise ImportError('pyproj or mpltoolkits-basemap required')
 
-        # calculate metrics based on x and y grid
-        super(CGrid_geo, self)._calculate_metrics()
-
-        # optionally calculate dx and dy based on great circle distances
-        # for more accurate cell sizes.
-        if self.use_gcdist:
-            geod = pyproj.Geod(ellps=self.ellipse)
-            az1, az2, dx = geod.inv(self.lon[:,1:], self.lat[:,1:],
-                                    self.lon[:,:-1], self.lat[:,:-1])
-            self.dx = 0.5 * (dx[1:,:] + dx[:-1,:])
-            self.pm = 1.0 / self.dx
-            az1, ax2, dy = geod.inv(self.lon[1:,:], self.lat[1:,:],
-                                    self.lon[:-1,:], self.lat[:-1,:])
-            self.dy = 0.5 * (dy[:,1:] + dy[:,:-1])
-            self.pn = 1.0 / self.dy
-
-
-    def __init__(self, lon, lat, proj, use_gcdist=True, ellipse='WGS84'):
         x, y = proj(lon, lat)
         self.lon_vert = lon
         self.lat_vert = lat
-        self.proj = proj
 
         # projection information
         self.use_gcdist = use_gcdist
         self.ellipse = ellipse
+        self.proj = proj
+        self.geod = pyproj.Geod(ellps=self.ellipse)
 
         super(CGrid_geo, self).__init__(x, y)
 
@@ -630,6 +622,30 @@ class CGrid_geo(CGrid):
 
         # coriolis frequency
         self.f = 2.0 * 7.29e-5 * np.cos(self.lat_rho * np.pi / 180.0)
+
+    @property
+    def dx(self):
+        if self.use_gcdist:
+            az1, az2, dx = geod.inv(self.lon[:,1:], self.lat[:,1:],
+                                    self.lon[:,:-1], self.lat[:,:-1])
+            return 0.5 * (dx[1:,:] + dx[:-1,:])
+        else:
+            x_temp = 0.5*(self.x_vert[1:, :]+self.x_vert[:-1, :])
+            y_temp = 0.5*(self.y_vert[1:, :]+self.y_vert[:-1, :])
+            dx = np.sqrt(np.diff(x_temp, axis=1)**2 + np.diff(y_temp, axis=1)**2)
+            return dx
+
+    @property
+    def dy(self):
+        if self.use_gcdist:
+            az1, ax2, dy = geod.inv(self.lon[1:,:], self.lat[1:,:],
+                                    self.lon[:-1,:], self.lat[:-1,:])
+            return 0.5 * (dy[:,1:] + dy[:,:-1])
+        else:
+            x_temp = 0.5*(self.x_vert[:, 1:]+self.x_vert[:, :-1])
+            y_temp = 0.5*(self.y_vert[:, 1:]+self.y_vert[:, :-1])
+            dy = np.sqrt(np.diff(x_temp, axis=0)**2 + np.diff(y_temp, axis=0)**2)
+            return dy
 
     def mask_polygon_geo(lonlat_verts, mask_value=0.0):
         lon, lat = zip(*lonlat_verts)
