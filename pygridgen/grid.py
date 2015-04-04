@@ -741,6 +741,115 @@ class Gridgen(CGrid):
 
     """
 
+    def __init__(self, xbry, ybry, beta, shape, ul_idx=0, focus=None,
+                 proj=None, nnodes=14, precision=1.0e-12, nppe=3,
+                 newton=True, thin=True, checksimplepoly=True,
+                 verbose=False, autogen=True):
+
+        # find the gridgen-c shared library
+        libgridgen_paths = [
+            ('libgridgen', os.path.join(sys.prefix, 'lib')),
+            ('libgridgen', '/usr/local/lib')
+        ]
+
+        for name, path in libgridgen_paths:
+            try:
+                self._libgridgen = np.ctypeslib.load_library(name, path)
+                break
+            except OSError:
+                pass
+            else:
+                print("libgridgen: attempted names/locations")
+                print(libgridgen_paths)
+                raise OSError('Failed to load libgridgen.')
+
+        # initialize/set types of critical variables
+        self._libgridgen.gridgen_generategrid2.restype = ctypes.c_void_p
+        self._libgridgen.gridnodes_getx.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_double))
+        self._libgridgen.gridnodes_gety.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_double))
+        self._libgridgen.gridnodes_getnce1.restype = ctypes.c_int
+        self._libgridgen.gridnodes_getnce2.restype = ctypes.c_int
+        self._libgridgen.gridmap_build.restype = ctypes.c_void_p
+
+        # store the boundary, reproject if possible
+        self.xbry = np.asarray(xbry, dtype='d')
+        self.ybry = np.asarray(ybry, dtype='d')
+        self.proj = proj
+        if self.proj is not None:
+            self.xbry, self.ybry = proj(self.xbry, self.ybry)
+
+        # store and check the beta parameter
+        self.beta = np.asarray(beta, dtype='d')
+        if self.beta.sum() != 4.0:
+            raise ValueError('sum of beta must be 4.0')
+
+        # properties
+        self._sigmas = None
+        self._nsigmas = None
+        self._ny = shape[0]
+        self._nx = shape[1]
+        self._focus = focus
+
+        # other inputs
+        self.ul_idx = ul_idx
+        self.nnodes = nnodes
+        self.precision = precision
+        self.nppe = nppe
+        self.newton = newton
+        self.thin = thin
+        self.checksimplepoly = checksimplepoly
+        self.verbose = verbose
+
+        # initialize the gridnodes object
+        self._gn = None
+
+        # generate the grid
+        if autogen:
+            self.generate_grid()
+
+    def __del__(self):
+        """delete gridnode object upon deletion"""
+        self._libgridgen.gridnodes_destroy(self._gn)
+
+    @property
+    def sigmas(self):
+        return self._sigmas
+    @sigmas.setter
+    def sigmas(self, value):
+        self._sigmas = value
+
+    @property
+    def nsigmas(self):
+        return self._nsigmas
+    @nsigmas.setter
+    def nsigmas(self, value):
+        self._nsigmas = value
+
+    @property
+    def nx(self):
+        return self._nx
+    @nx.setter
+    def nx(self, value):
+        self._nx = value
+
+    @property
+    def ny(self):
+        return self._ny
+    @ny.setter
+    def ny(self, value):
+        self._ny = value
+
+    @property
+    def shape(self):
+        return (self.ny, self.nx)
+
+    @property
+    def focus(self):
+        return self._focus
+    @focus.setter
+    def focus(self, value):
+        self._focus = value
+
     def generate_grid(self):
 
         if self._gn is not None:
@@ -814,114 +923,6 @@ class Gridgen(CGrid):
 
         super(Gridgen, self).__init__(x, y)
 
-    def __init__(self, xbry, ybry, beta, shape, ul_idx=0, focus=None,
-                 proj=None, nnodes=14, precision=1.0e-12, nppe=3,
-                 newton=True, thin=True, checksimplepoly=True,
-                 verbose=False, autogen=True):
-
-        # find the gridgen-c shared library
-        libgridgen_paths = [
-            ('libgridgen', os.path.join(sys.prefix, 'lib')),
-            ('libgridgen', '/usr/local/lib')
-        ]
-
-        for name, path in libgridgen_paths:
-            try:
-                self._libgridgen = np.ctypeslib.load_library(name, path)
-                break
-            except OSError:
-                pass
-            else:
-                print("libgridgen: attempted names/locations")
-                print(libgridgen_paths)
-                raise OSError('Failed to load libgridgen.')
-
-        # initialize/set types of critical variables
-        self._libgridgen.gridgen_generategrid2.restype = ctypes.c_void_p
-        self._libgridgen.gridnodes_getx.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_double))
-        self._libgridgen.gridnodes_gety.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_double))
-        self._libgridgen.gridnodes_getnce1.restype = ctypes.c_int
-        self._libgridgen.gridnodes_getnce2.restype = ctypes.c_int
-        self._libgridgen.gridmap_build.restype = ctypes.c_void_p
-
-        # store the boundary, reproject if possible
-        self.xbry = np.asarray(xbry, dtype='d')
-        self.ybry = np.asarray(ybry, dtype='d')
-        self.proj = proj
-        if self.proj is not None:
-            self.xbry, self.ybry = proj(self.xbry, self.ybry)
-
-        # store and check the beta parameter
-        self.beta = np.asarray(beta, dtype='d')
-        if self.beta.sum() != 4.0:
-            raise ValueError('sum of beta must be 4.0')
-
-        # properties
-        self._sigmas = None
-        self._nsigmas = None
-        self._ny = shape[0]
-        self._nx = shape[1]
-        self._focus = focus
-
-        # other inputs
-        self.ul_idx = ul_idx
-        self.nnodes = nnodes
-        self.precision = precision
-        self.nppe = nppe
-        self.newton = newton
-        self.thin = thin
-        self.checksimplepoly = checksimplepoly
-        self.verbose = verbose
-
-        # initialize the gridnodes object
-        self._gn = None
-
-        # generate the grid
-        if autogen:
-            self.generate_grid()
-
-    @property
-    def sigmas(self):
-        return self._sigmas
-    @sigmas.setter
-    def sigmas(self, value):
-        self._sigmas = value
-
-    @property
-    def nsigmas(self):
-        return self._nsigmas
-    @nsigmas.setter
-    def nsigmas(self, value):
-        self._nsigmas = value
-
-    @property
-    def nx(self):
-        return self._nx
-    @nx.setter
-    def nx(self, value):
-        self._nx = value
-
-    @property
-    def ny(self):
-        return self._ny
-    @ny.setter
-    def ny(self, value):
-        self._ny = value
-
-    @property
-    def shape(self):
-        return (self.ny, self.nx)
-
-    @property
-    def focus(self):
-        return self._focus
-    @focus.setter
-    def focus(self, value):
-        self._focus = value
-
-    def __del__(self):
-        """delete gridnode object upon deletion"""
-        self._libgridgen.gridnodes_destroy(self._gn)
 
 
 def rho_to_vert(xr, yr, pm, pn, ang):  # pragma: no cover
