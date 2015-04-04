@@ -612,6 +612,14 @@ class CGrid(object):
 
     def __init__(self, x, y):
 
+        # grid (verts/nodes)
+        self._x = None
+        self._y = None
+        self._mask = None
+
+        # subgrid masks
+        self._mask_rho = None
+
         if np.ndim(x) != 2 and np.ndim(y) != 2:
             raise ValueError('x and y must be two dimensional')
 
@@ -625,106 +633,281 @@ class CGrid(object):
         self.x_vert = x
         self.y_vert = y
 
-        mask_shape = tuple([n-1 for n in self.x_vert.shape])
-        self.mask_rho = np.ones(mask_shape, dtype='d')
+    @property
+    def x(self):
+        '''
+        x-coordinate of the grid vertices (a.k.a. nodes)
+        '''
+        if self._x is None:
+            self._x = self.x_vert
+        return self._x
 
-        # If maskedarray is given for verticies, modify the mask such that
-        # non-existant grid points are masked.  A cell requires all four
-        # verticies to be defined as a water point.
-        if isinstance(self.x_vert, np.ma.MaskedArray):
-            mask = (self.x_vert.mask[:-1,:-1] | self.x_vert.mask[1:,:-1] | \
-                    self.x_vert.mask[:-1,1:] | self.x_vert.mask[1:,1:])
-            self.mask_rho = np.asarray(~(~np.bool_(self.mask_rho) | mask), dtype='d')
+    @property
+    def y(self):
+        '''
+        y-coordinate of the grid vertices (a.k.a. nodes)
+        '''
+        if self._y is None:
+            self._y = self.y_vert
+        return self._y
 
-        if isinstance(self.y_vert, np.ma.MaskedArray):
-            mask = (self.y_vert.mask[:-1,:-1] | self.y_vert.mask[1:,:-1] | \
-                    self.y_vert.mask[:-1,1:] | self.y_vert.mask[1:,1:])
-            self.mask_rho = np.asarray(~(~np.bool_(self.mask_rho) | mask), dtype='d')
+    @property
+    def mask(self):
+        '''
+        Mask for the cells (same as mask_rho)
+        '''
+        return self.mask_rho
 
-        self._calculate_subgrids()
-        self._calculate_metrics()
+    @property
+    def x_rho(self):
+        '''
+        x-coordinates of cell centroids
+        '''
+        x_rho = 0.25 * (self.x_vert[1:, 1:] + self.x_vert[1:, :-1] +
+                        self.x_vert[:-1, 1:] + self.x_vert[:-1, :-1])
+        return x_rho
 
-    def _calculate_subgrids(self):
-        self.x_rho = 0.25*(self.x_vert[1:,1:]+self.x_vert[1:,:-1]+ \
-                           self.x_vert[:-1,1:]+self.x_vert[:-1,:-1])
-        self.y_rho = 0.25*(self.y_vert[1:,1:]+self.y_vert[1:,:-1]+ \
-                           self.y_vert[:-1,1:]+self.y_vert[:-1,:-1])
-        self.x_u = 0.5*(self.x_vert[:-1,1:-1] + self.x_vert[1:,1:-1])
-        self.y_u = 0.5*(self.y_vert[:-1,1:-1] + self.y_vert[1:,1:-1])
-        self.x_v = 0.5*(self.x_vert[1:-1,:-1] + self.x_vert[1:-1,1:])
-        self.y_v = 0.5*(self.y_vert[1:-1,:-1] + self.y_vert[1:-1,1:])
-        self.x_psi = self.x_vert[1:-1,1:-1]
-        self.y_psi = self.y_vert[1:-1,1:-1]
+    @property
+    def y_rho(self):
+        '''
+        y-coordinates of cell centroids
+        '''
+        y_rho = 0.25 * (self.y_vert[1:, 1:] + self.y_vert[1:, :-1] +
+                        self.y_vert[:-1, 1:] + self.y_vert[:-1, :-1])
+        return y_rho
 
-    def _calculate_metrics(self):
-        'Calculates pm, pn, dndx, dmde, and angle from x_vert and y_vert'
-        x_temp = 0.5*(self.x_vert[1:,:]+self.x_vert[:-1,:])
-        y_temp = 0.5*(self.y_vert[1:,:]+self.y_vert[:-1,:])
-        self.dx = np.sqrt(np.diff(x_temp, axis=1)**2 + np.diff(y_temp, axis=1)**2)
-        x_temp = 0.5*(self.x_vert[:,1:]+self.x_vert[:,:-1])
-        y_temp = 0.5*(self.y_vert[:,1:]+self.y_vert[:,:-1])
-        self.dy = np.sqrt(np.diff(x_temp, axis=0)**2 + np.diff(y_temp, axis=0)**2)
+    @property
+    def mask_rho(self):
+        '''
+        Returns the mask for the cells
+        '''
+        if self._mask_rho is None:
+            mask_shape = tuple([n-1 for n in self.x_vert.shape])
+            self._mask_rho = np.ones(mask_shape, dtype='d')
 
+            # If maskedarray is given for vertices, modify the mask such that
+            # non-existant grid points are masked.  A cell requires all four
+            # verticies to be defined as a water point.
+            if isinstance(self.x_vert, np.ma.MaskedArray):
+                mask = (self.x_vert.mask[:-1,:-1] | self.x_vert.mask[1:,:-1] |
+                        self.x_vert.mask[:-1,1:] | self.x_vert.mask[1:,1:])
+                self._mask_rho = np.asarray(
+                    ~(~np.bool_(self.mask_rho) | mask),
+                    dtype='d'
+                )
+
+            if isinstance(self.y_vert, np.ma.MaskedArray):
+                mask = (self.y_vert.mask[:-1,:-1] | self.y_vert.mask[1:,:-1] |
+                        self.y_vert.mask[:-1,1:] | self.y_vert.mask[1:,1:])
+                self._mask_rho = np.asarray(
+                    ~(~np.bool_(self.mask_rho) | mask),
+                    dtype='d'
+                )
+
+        return self._mask_rho
+    @mask_rho.setter
+    def mask_rho(self, value):
+        if value.shape == self._mask_rho.shape:
+            self._mask_rho = value
+        else:
+            raise ValueError("shapes are mismatched")
+
+    @property
+    def x_u(self):
+        '''
+        x-coordinate of u-point (leading edge in i-direction?)
+        '''
+        return 0.5*(self.x_vert[:-1, 1:-1] + self.x_vert[1:, 1:-1])
+
+    @property
+    def y_u(self):
+        '''
+        y-coordinate of u-point (leading edge in i-direction?)
+        '''
+        return 0.5*(self.y_vert[:-1, 1:-1] + self.y_vert[1:, 1:-1])
+
+    @property
+    def mask_u(self):
+        '''
+        Mask for the u-points
+        '''
+        return self.mask_rho[:,1:] * self.mask_rho[:,:-1]
+
+    @property
+    def x_v(self):
+        '''
+        x-coordinate of y-point (leading edge in j-direction?)
+        '''
+        return 0.5*(self.x_vert[1:-1, :-1] + self.x_vert[1:-1, 1:])
+
+    @property
+    def y_v(self):
+        '''
+        y-coordinate of y-point (leading edge in j-direction?)
+        '''
+        return 0.5*(self.y_vert[1:-1, :-1] + self.y_vert[1:-1, 1:])
+
+    @property
+    def mask_v(self):
+        '''
+        mask for the v-points
+        '''
+        return self.mask_rho[1:, :]*self.mask_rho[:-1, :]
+
+    @property
+    def x_psi(self):
+        '''
+        x-coordinate of the anchor node for each cell? (upper left?)
+        '''
+        return self.x_vert[1:-1, 1:-1]
+
+    @property
+    def y_psi(self):
+        '''
+        y-coordinate of the anchor node for each cell? (upper left?)
+        '''
+        return self.y_vert[1:-1, 1:-1]
+
+    @property
+    def mask_psi(self):
+        '''
+        mask for the psi-points
+        '''
+        mask_psi = (self.mask_rho[1:, 1:] * self.mask_rho[:-1, 1:] *
+                    self.mask_rho[1:, :-1] * self.mask_rho[:-1, :-1])
+        return mask_psi
+
+    @property
+    def dx(self):
+        '''
+        dimension of cell in x-direction?
+        '''
+        x_temp = 0.5*(self.x_vert[1:, :]+self.x_vert[:-1, :])
+        y_temp = 0.5*(self.y_vert[1:, :]+self.y_vert[:-1, :])
+        dx = np.sqrt(np.diff(x_temp, axis=1)**2 + np.diff(y_temp, axis=1)**2)
+        return dx
+
+    @property
+    def dy(self):
+        '''
+        dimension of cell in y-direction?
+        '''
+        x_temp = 0.5*(self.x_vert[:, 1:]+self.x_vert[:, :-1])
+        y_temp = 0.5*(self.y_vert[:, 1:]+self.y_vert[:, :-1])
+        dy = np.sqrt(np.diff(x_temp, axis=0)**2 + np.diff(y_temp, axis=0)**2)
+        return dy
+
+    @property
+    def dndx(self):
         if isinstance(self.dy, np.ma.MaskedArray):
-            self.dndx = np.ma.zeros(self.x_rho.shape, dtype='d')
+            dndx = np.ma.zeros(self.x_rho.shape, dtype='d')
         else:
-            self.dndx = np.zeros(self.x_rho.shape, dtype='d')
+            dndx = np.zeros(self.x_rho.shape, dtype='d')
 
+        dndx[1:-1, 1:-1] = 0.5*(self.dy[1:-1, 2:] - self.dy[1:-1, :-2])
+        return dndx
+
+    @property
+    def dmde(self):
         if isinstance(self.dx, np.ma.MaskedArray):
-            self.dmde = np.ma.zeros(self.x_rho.shape, dtype='d')
+            dmde = np.ma.zeros(self.x_rho.shape, dtype='d')
         else:
-            self.dmde = np.zeros(self.x_rho.shape, dtype='d')
+            dmde = np.zeros(self.x_rho.shape, dtype='d')
 
-        self.dndx[1:-1,1:-1] = 0.5*(self.dy[1:-1,2:] - self.dy[1:-1,:-2])
-        self.dmde[1:-1,1:-1] = 0.5*(self.dx[2:,1:-1] - self.dx[:-2,1:-1])
+        dmde[1:-1, 1:-1] = 0.5*(self.dx[2:, 1:-1] - self.dx[:-2,1 :-1])
+        return dmde
 
+    @property
+    def angle(self):
         if isinstance(self.x_vert, np.ma.MaskedArray) or \
            isinstance(self.y_vert, np.ma.MaskedArray):
-            self.angle = np.ma.zeros(self.x_vert.shape, dtype='d')
+            angle = np.ma.zeros(self.x_vert.shape, dtype='d')
         else:
-            self.angle = np.zeros(self.x_vert.shape, dtype='d')
+            angle = np.zeros(self.x_vert.shape, dtype='d')
 
-        angle_ud = np.arctan2(np.diff(self.y_vert, axis=1), np.diff(self.x_vert, axis=1))
-        angle_lr = np.arctan2(np.diff(self.y_vert, axis=0), np.diff(self.x_vert, axis=0)) - np.pi/2.0
+        angle_ud = np.arctan2(np.diff(self.y_vert, axis=1),
+                              np.diff(self.x_vert, axis=1))
+        angle_lr = np.arctan2(np.diff(self.y_vert, axis=0),
+                              np.diff(self.x_vert, axis=0)) - (np.pi / 2.0)
 
         # domain center
-        self.angle[1:-1,1:-1] = 0.25*(angle_ud[1:-1,1:]+angle_ud[1:-1,:-1]\
-                                     +angle_lr[1:,1:-1]+angle_lr[:-1,1:-1])
+        angle[1:-1, 1:-1] = 0.25 * (
+            angle_ud[1:-1, 1:] + angle_ud[1:-1, :-1] +
+            angle_lr[1:, 1:-1] + angle_lr[:-1, 1:-1])
+
         # edges
-        self.angle[0,1:-1] = (1.0/3.0)*(angle_lr[0,1:-1]+angle_ud[0,1:]+angle_ud[0,:-1])
-        self.angle[-1,1:-1] = (1.0/3.0)*(angle_lr[-1,1:-1]+angle_ud[-1,1:]+angle_ud[-1,:-1])
-        self.angle[1:-1,0] = (1.0/3.0)*(angle_ud[1:-1,0]+angle_lr[1:,0]+angle_lr[:-1,0])
-        self.angle[1:-1,-1] = (1.0/3.0)*(angle_ud[1:-1,-1]+angle_lr[1:,-1]+angle_lr[:-1,-1])
+        angle[0, 1:-1] = (1.0 / 3.0) * (
+            angle_lr[0, 1:-1] + angle_ud[0, 1:] + angle_ud[0, :-1]
+        )
+        angle[-1, 1:-1] = (1.0 / 3.0) * (
+            angle_lr[-1, 1:-1] + angle_ud[-1, 1:] + angle_ud[-1, :-1]
+        )
+
+        angle[1:-1, 0] = (1.0 / 3.0) * (
+            angle_ud[1:-1, 0] + angle_lr[1:, 0] + angle_lr[:-1, 0]
+        )
+
+        angle[1:-1, -1] = (1.0 / 3.0) * (
+            angle_ud[1:-1, -1] + angle_lr[1:, -1] + angle_lr[:-1, -1]
+        )
 
         #corners
-        self.angle[0,0] = 0.5*(angle_lr[0,0]+angle_ud[0,0])
-        self.angle[0,-1] = 0.5*(angle_lr[0,-1]+angle_ud[0,-1])
-        self.angle[-1,0] = 0.5*(angle_lr[-1,0]+angle_ud[-1,0])
-        self.angle[-1,-1] = 0.5*(angle_lr[-1,-1]+angle_ud[-1,-1])
+        angle[0, 0] = 0.5 * (angle_lr[0, 0] + angle_ud[0, 0])
+        angle[0, -1] = 0.5 * (angle_lr[0, -1] + angle_ud[0, -1])
+        angle[-1, 0] = 0.5 * (angle_lr[-1, 0] + angle_ud[-1, 0])
+        angle[-1, -1] = 0.5 * (angle_lr[-1, -1] + angle_ud[-1, -1])
 
-        self.angle_rho = np.arctan2(np.diff(0.5*(self.y_vert[1:,:]+self.y_vert[:-1,:])), \
-                                    np.diff(0.5*(self.x_vert[1:,:]+self.x_vert[:-1,:])))
+        return angle
 
-    def calculate_orthogonality(self):
+    @property
+    def angle_rho(self):
+        angle_rho = np.arctan2(
+            np.diff(0.5 * (self.y_vert[1:, :] + self.y_vert[:-1, :])),
+            np.diff(0.5 * (self.x_vert[1:, :] + self.x_vert[:-1, :]))
+        )
+
+        return angle_rho
+
+    @property
+    def orthogonality(self):
         '''
         Calculate orthogonality error in radians
         '''
         z = self.x_vert + 1j*self.y_vert
-        du = np.diff(z, axis=1); du = (du/abs(du))[:-1,:]
-        dv = np.diff(z, axis=0); dv = (dv/abs(dv))[:,:-1]
+
+        du = np.diff(z, axis=1)
+        du = (du / abs(du))[:-1 ,:]
+        dv = np.diff(z, axis=0)
+        dv = (dv / abs(dv))[:, :-1]
         ang1 = np.arccos(du.real*dv.real + du.imag*dv.imag)
-        du = np.diff(z, axis=1); du = (du/abs(du))[1:,:]
-        dv = np.diff(z, axis=0); dv = (dv/abs(dv))[:,:-1]
+
+        du = np.diff(z, axis=1)
+        du = (du / abs(du))[1:, :]
+        dv = np.diff(z, axis=0)
+        dv = (dv / abs(dv))[:, :-1]
         ang2 = np.arccos(du.real*dv.real + du.imag*dv.imag)
-        du = np.diff(z, axis=1); du = (du/abs(du))[:-1,:]
-        dv = np.diff(z, axis=0); dv = (dv/abs(dv))[:,1:]
+
+        du = np.diff(z, axis=1)
+        du = (du / abs(du))[:-1, :]
+        dv = np.diff(z, axis=0)
+        dv = (dv / abs(dv))[:, 1:]
         ang3 = np.arccos(du.real*dv.real + du.imag*dv.imag)
-        du = np.diff(z, axis=1); du = (du/abs(du))[1:,:]
-        dv = np.diff(z, axis=0); dv = (dv/abs(dv))[:,1:]
+
+        du = np.diff(z, axis=1)
+        du = (du / abs(du))[1:, :]
+        dv = np.diff(z, axis=0)
+        dv = (dv / abs(dv))[:, 1:]
         ang4 = np.arccos(du.real*dv.real + du.imag*dv.imag)
+
         ang = np.mean([abs(ang1), abs(ang2), abs(ang3), abs(ang4)], axis=0)
-        ang = (ang-np.pi/2.0)
+        ang = (ang - np.pi/2.0)
         return ang
+
+    def calculate_orthogonality(self):
+        '''
+        Should deprecate in favor of property ``orthogonality``
+        '''
+        return self.orthogonality
 
     def mask_polygon(self, polyverts, mask_value=0.0):
         """
@@ -749,33 +932,15 @@ class CGrid(object):
         if polyverts.shape[0] < 3:
             raise ValueError('polyverts must contain at least 3 points')
 
-        mask = self.mask_rho
+        mask = self.mask_rho.copy()
         inside = points_inside_poly(
             np.vstack([self.x_rho.flatten(), self.y_rho.flatten()]).T,
             polyverts
         )
         if np.any(inside):
-            self.mask_rho.flat[inside] = mask_value
+            mask.flat[inside] = mask_value
 
-    def _get_mask_u(self):
-        return self.mask_rho[:,1:]*self.mask_rho[:,:-1]
-
-    def _get_mask_v(self):
-        return self.mask_rho[1:,:]*self.mask_rho[:-1,:]
-
-    def _get_mask_psi(self):
-        return self.mask_rho[1:,1:]*self.mask_rho[:-1,1:]* \
-               self.mask_rho[1:,:-1]*self.mask_rho[:-1,:-1]
-
-    def _set_mask_rho(self, mask_rho):
-        self.mask_rho = mask_rho
-
-    x = property(lambda self: self.x_vert, None, None, 'Return x_vert')
-    y = property(lambda self: self.y_vert, None, None, 'Return x_vert')
-    mask = property(lambda self: self.mask_rho, _set_mask_rho, None, 'Return mask_rho')
-    mask_u   = property(_get_mask_u, None, None, 'Return mask_u')
-    mask_v   = property(_get_mask_v, None, None, 'Return mask_v')
-    mask_psi = property(_get_mask_psi, None, None, 'Return mask_psi')
+        self.mask_rho = mask
 
 
 class CGrid_geo(CGrid):
@@ -940,7 +1105,6 @@ class Gridgen(CGrid):
 
         if self._gn is not None:
             self._libgridgen.gridnodes_destroy(self._gn)
-
 
         # number of boundary points
         nbry = len(self.xbry)
@@ -1114,7 +1278,6 @@ class Gridgen(CGrid):
     @focus.setter
     def focus(self, value):
         self._focus = value
-
 
     def __del__(self):
         """delete gridnode object upon deletion"""

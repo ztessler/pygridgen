@@ -1,9 +1,16 @@
 language: python
 
-env:
-  - PYTHON=2.7
-  - PYTHON=3.3
-  - PYTHON=3.4
+matrix:
+  include:
+    - python: 2.7
+      env:
+        - COVERAGE=false
+    - python: 3.3
+      env:
+        - COVERAGE=false
+    - python: 3.4
+      env:
+        - COVERAGE=true
 
 before_install:
   - sudo apt-get update -yq
@@ -14,8 +21,10 @@ before_install:
 
 install:
   - conda update conda --yes
-  - conda create --name testenv --yes basemap nose python=$PYTHON
+  - conda create --name testenv --yes python=$TRAVIS_PYTHON_VERSION numpy matplotlib nose pyyaml requests docopt coverage
   - source activate testenv
+  - conda config --add channels JimInCO
+  - conda install --yes pyproj
   - cd external/nn
   - ./configure
   - sudo make install
@@ -34,6 +43,7 @@ install:
   - sudo make install
   - cd ../..
   - pip install .
+  - pip install coveralls
 
 
 before_script:
@@ -41,4 +51,7 @@ before_script:
   - ls -al /usr/local/include
 
 script:
-  nosetests --verbose --with-id
+  - nosetests --with-coverage --cover-package=pygridgen --verbose
+
+after_success:
+  - if [ ${COVERAGE} = true ]; then coveralls; fi
