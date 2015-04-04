@@ -7,6 +7,7 @@ import sys
 import ctypes
 
 import numpy as np
+from matplotlib.path import Path
 
 
 def points_inside_poly(points, verts):
