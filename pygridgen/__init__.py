@@ -14,6 +14,7 @@ Released under an MIT license.
 
 from .grid import *
 from .csa import *
+from .boundary_interactor import *
 
 __authors__ = ['Robert Hetland <hetland@tamu.edu>',
                'Rich Signell <rsignell@gmail.com']
