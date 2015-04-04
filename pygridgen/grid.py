@@ -908,7 +908,7 @@ class Gridgen(CGrid):
         self._libgridgen.gridnodes_destroy(self._gn)
 
 
-def rho_to_vert(xr, yr, pm, pn, ang):
+def rho_to_vert(xr, yr, pm, pn, ang):  # pragma: no cover
     Mp, Lp = xr.shape
     x = empty((Mp+1, Lp+1), dtype='d')
     y = empty((Mp+1, Lp+1), dtype='d')
@@ -957,7 +957,7 @@ def rho_to_vert(xr, yr, pm, pn, ang):
     return x, y
 
 
-def uvp_masks(rmask):
+def uvp_masks(rmask):  # pragma: no cover
     '''
     return u-, v-, and psi-masks based on input rho-mask
 
