@@ -868,11 +868,11 @@ class Gridgen(CGrid):
         
         print 'step 3'
         
-        # x = self._libgridgen.gridnodes_getx(self._gn)
-        # print 'step 4'
-        # x = np.asarray([x[0][i] for i in range(self.ny*self.nx)])
-        # # x = np.asarray([x[j][i] for j in range(self.ny) for i in range(self.nx)])
-        # x.shape = (self.ny, self.nx)
+        x = self._libgridgen.gridnodes_getx(self._gn)
+        print 'step 4'
+        x = np.asarray([x[0][i] for i in range(self.ny*self.nx)])
+        # x = np.asarray([x[j][i] for j in range(self.ny) for i in range(self.nx)])
+        x.shape = (self.ny, self.nx)
         
         y = self._libgridgen.gridnodes_gety(self._gn)    
         y = np.asarray([y[0][i] for i in range(self.ny*self.nx)])            

@@ -2264,7 +2264,7 @@ void gridgen_generategrid(char* prmfname)
         map_quadrilaterals(gg);
 
     generate_grid(gg);
-
+    
     gridgen_destroy(gg);
 }
 
@@ -2274,7 +2274,7 @@ gridnodes* gridgen_generategrid2(int nbdry, double xbdry[], double ybdry[], doub
 {
     gridgen* gg = NULL;
     gridnodes* gn = NULL;
-
+    
     gg = gridgen_create2(nbdry, xbdry, ybdry, beta, ul, nx, ny, ngrid, xgrid, ygrid, nnodes, newton, precision, checksimplepoly, thin, nppe, verbose, nsigmas, sigmas, nrect, xrect, yrect);
 
     /*

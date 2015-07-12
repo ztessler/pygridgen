@@ -19,10 +19,6 @@ Topic :: Software Development :: Libraries :: Python Modules
 
 from numpy.distutils.core import Extension
 
-csa = Extension(name = '_csa',
-                sources=["pygridgen/src/csa/csa.c",
-                         "pygridgen/src/csa/svd.c"])
-
 doclines = __doc__.split("\n")
 
 if __name__ == '__main__':
@@ -38,7 +34,6 @@ if __name__ == '__main__':
           license = 'BSD',
           platforms = ["any"],
           ext_package='pygridgen',
-          ext_modules = [csa, ], 
           classifiers = filter(None, classifiers.split("\n")),
           )
     
