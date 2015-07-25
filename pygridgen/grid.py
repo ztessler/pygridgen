@@ -764,7 +764,7 @@ class Gridgen(CGrid):
                 raise OSError('Failed to load libgridgen.')
 
         # initialize/set types of critical variables
-        self._libgridgen.gridgen_generategrid2.restype = ctypes.c_void_p
+        self._libgridgen.gridgen_generategrid2.restype = ctypes.POINTER(ctypes.c_void_p)
         self._libgridgen.gridnodes_getx.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_double))
         self._libgridgen.gridnodes_gety.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_double))
         self._libgridgen.gridnodes_getnce1.restype = ctypes.c_int
