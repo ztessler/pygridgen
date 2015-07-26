@@ -14,7 +14,7 @@ install:
   - conda update conda --yes
   - conda create --name testenv --yes pip matplotlib numpy nose python=$PYTHON
   - source activate testenv
-  - conda install -c https://conda.binstar.org/ocefpaf pyproj --yes
+  - conda install -c https://conda.binstar.org/IOOS pyproj --yes
   - cd external/nn
   - ./configure
   - sudo make install
