@@ -23,7 +23,7 @@ install:
   - conda update conda --yes
   - conda create --name testenv --yes python=$TRAVIS_PYTHON_VERSION numpy matplotlib nose pyyaml requests docopt coverage
   - source activate testenv
-  - conda config --add channels JimInCO
+  - conda config --add channels IOOS
   - conda install --yes pyproj
   - cd external/nn
   - ./configure
