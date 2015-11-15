@@ -748,13 +748,13 @@ class Gridgen(CGrid):
 
         # find the gridgen-c shared library
         libgridgen_paths = [
-            ('libgridgen', os.path.join(sys.prefix, 'lib')),
-            ('libgridgen', '/usr/local/lib')
+            os.path.join(sys.prefix, 'lib'),
+            '/usr/local/lib',
         ]
 
-        for name, path in libgridgen_paths:
+        for path in libgridgen_paths:
             try:
-                self._libgridgen = np.ctypeslib.load_library(name, path)
+                self._libgridgen = np.ctypeslib.load_library('libgridgen.so', path)
                 break
             except OSError:
                 pass
