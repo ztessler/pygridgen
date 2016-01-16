@@ -147,47 +147,34 @@ class Focus(object):
      [ 0.          0.62479833  1.        ]]
 
     """
-    def __init__(self):
-        self._focuspoints = []
 
-    def add_focus_x(self, xo, factor=2.0, Rx=0.1):
-        """Add a focused x-location
+    def __init__(self, *foci):
+        self._focuspoints = list(foci)
 
-        This adds a focused location to a grid. Can be called multiple
-        times.
+    def add_focus(self, pos, axis, factor=2.0, extent=0.1):
+        """
+        Add a single point of focus along an axis.
+
+        This adds a focused location to a grid and can be called multiple
+        times in either the x- or y-direction.
 
         Parameters
         ----------
-        xo : float
-            Location about which to focus grid
+        pos : float
+            Relative position within the grid of the focus. This must
+            be in the range [0, 1]
+        axis : string ('x' or 'y')
+            Axis along which the grid will be focused.
         factor : float
             Amount to focus grid. Creates cell sizes that are factor
             smaller (factor > 1) or larger (factor < 1) in the focused
             region.
-        Rx : float
-            Lateral extent of focused region, similar to a lateral
-            spatial scale for the focusing region.
+        extent : float
+            Lateral extent of focused region.
+
         """
-        self._focuspoints.append(_FocusPoint(xo, 'x', factor, Rx))
 
-    def add_focus_y(self, yo, factor=2.0, Ry=0.1):
-        """Add a focused y-location
-
-        This adds a focused location to a grid. Can be called multiple
-        times.
-
-        Parameters
-        ----------
-        yo : float
-            Location about which to focus grid
-        factor : float
-            Amount to focus grid. Creates cell sizes that are factor smaller
-            (factor > 1) or larger (factor < 1) in the focused region.
-        Ry : float
-            Lateral extent of focused region, similar to a lateral spatial
-            scale for the focusing region.
-        """
-        self._focuspoints.append(_FocusPoint(yo, 'y', factor, Ry))
+        self._focuspoints.append(_FocusPoint(pos, axis, factor, extent))
 
     def __call__(self, x, y):
         """docstring for __call__"""
