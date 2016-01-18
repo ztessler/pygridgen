@@ -5,20 +5,31 @@
 
 Installation
 ------------
+
+.. toctree::
+   :maxdepth: 1
+
    install/conda.rst
    install/build_linux.rst
-   install/build_mac.rst
-
+   install/build_osx.rst
 
 Tutorials
 ---------
-   tutorial/overview
-   tutorial/fitting
+
+.. toctree::
+   :maxdepth: 2
+
+   tutorial/basics
+   tutorial/gridgen_examples
 
 API Reference
 -------------
+
+.. toctree::
+   :maxdepth: 2
+
    api/grid.rst
-   api/csa.rst
+
 
 Indices and tables
 ==================

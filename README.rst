@@ -14,25 +14,21 @@ The full documentation for this for library is `here`_.
 
 .. _here: https://phobson.github.io/pygridgen
 
+For more detailed documentation on grid generation, manipulation, and visualization,
+see the documentation for `pygridtools`_.
 
-Installation
-------------
-For linux and Mac OS X, binaries are available trouth the IOOS conda `channel`_.
-Installation is as simple as::
+.. _pygridtools: https://phobson.github.io/pygridtools
 
-    $ conda create --name=grid python=3.4
-    $ source activate grid
-    $ conda install --channel=IOOS pygridgen
 
-.. _channel: http://anaconda.org/IOOS/pygridgen
+Credits
+-------
+This fork of ``pygridgen`` stands on the very tall shoulders of `Robert Hetland`_ of Texam A&M Universits.
+Many thanks to him, `Richard Signell`_, `Fillipe Fernandes`_, and all of the other contributors.
 
-To build from source, see the installation guides for your platform:
+.. _Robert Hetland: https://github.com/hetland
+.. _Richard Signell: https://github.com/rsignell-usgs
+.. _Fillipe Fernandes: https://github.com/ocefpaf
 
- + `Building on OS X`_
- + `Building on Linux`_
-
-.. _Building on OS X: install/build_osx.rst
-.. _Building on Linux: install/build_linux.rst
 
 Python Dependencies
 -------------------
@@ -40,14 +36,14 @@ Python Dependencies
 Basics
 ~~~~~~
 
-Provided that all of the shared C libraries are installs as covered in `Installation`_, the remaining python depedencies are the following::
+Provided that all of the shared C libraries are installed as covered in per the instructions below, the remaining python depedencies are the following:
 
-  * numpy
-  * matplotlib
-  * pyproj or mpl-basemap (only if working with geographic coordinates)
+* numpy
+* matplotlib
+* pyproj (only if working with geographic coordinates)
 
 Testing
 ~~~~~~~
 
 Tests are written using the `nose` package.
-From the source tree, run them simply with by invoking `nosetests` in a terminal.
+From the source tree, run them simply with by invoking ``nosetests`` in a terminal.

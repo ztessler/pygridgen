@@ -817,7 +817,7 @@ class Gridgen(CGrid):
 
         # store and check the beta parameter
         self.beta = np.asarray(beta, dtype='d')
-        if self.beta.sum() != 4.0:
+        if not np.isclose(self.beta.sum(), 4.0):
             raise ValueError('sum of beta must be 4.0')
 
         # properties
