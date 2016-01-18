@@ -198,7 +198,7 @@ if __name__ == '__main__':
     xout, yout = np.mgrid[-3:3:100j, -3:3:100j]
 
     csa_interp = CSA(xin, yin, zin)
-    fig, (ax1, ax2 = plt.subplots(ncols=2)
+    fig, (ax1, ax2) = plt.subplots(ncols=2)
     csa_interp.plot(xout, yout, ax=ax1, mesh_opts=dict(vmin=-1, vmax=1),
                     scatter_opts=dict(vmin=-1, vmax=1, edgecolors='none'))
 
