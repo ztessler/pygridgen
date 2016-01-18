@@ -1,0 +1,107 @@
+
+Examples from the gridgen-c library
+-----------------------------------
+
+These are some examples from the original ``gridgen-c`` library.
+
+.. code:: python
+
+    import warnings
+    warnings.simplefilter('ignore')
+    
+    import numpy
+    from matplotlib import pyplot
+    import pandas
+    import seaborn
+    clear_bkgd = {'axes.facecolor':'none', 'figure.facecolor':'none'}
+    seaborn.set(style='ticks', context='notebook', rc=clear_bkgd)
+    
+    import pygridgen
+    %matplotlib inline
+    
+    def plot_grid(grid, ax):
+        ax.plot(grid.x.flatten(), grid.y.flatten(), 'k.', label='Grid nodes', zorder=5)
+        ax.set_aspect('equal')
+        ax.plot(grid.xbry, grid.ybry, '-', color='0.5', zorder=0)
+        pos = numpy.nonzero(grid.beta > 0)
+        neg = numpy.nonzero(grid.beta < 0)
+        
+        ax.plot(x[pos], y[pos], 'go', label='Positive', zorder=2, alpha=0.5)
+        ax.plot(x[neg], y[neg], 'rs', label='Negative', zorder=2, alpha=0.5)
+        
+        ax.legend(numpoints=1, loc='lower left')
+        
+    def read_boundary(example):
+        df = pandas.read_table("gg_examples/xy.{}".format(example), sep='\s+').fillna(0)
+        x, y, beta = df['x'].values, df['y'].values, df['b'].values
+        ul_idx = numpy.nonzero(df['ul'])[0][0]
+        return x, y, beta, ul_idx
+
+Sensitivity to :math:`\beta`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This examples shows how a subtle change in the placement of the negative
+turning points changes how many nodes are "captured" into the side
+channel and alters the layout of the whole grid.
+
+.. code:: python
+
+    fig, axes = pyplot.subplots(figsize=(15, 7), ncols=2, 
+                                sharex=True, sharey=True)
+    
+    for n, ax in enumerate(axes, 1):
+        x, y, beta, ul_idx = read_boundary(n)
+        grid = pygridgen.Gridgen(x, y, beta, ul_idx=ul_idx, shape=(40, 20))
+        plot_grid(grid, ax=ax)
+        ax.set_xlim(left=-1.25, right=2.50)
+
+
+
+.. image:: gridgen_examples_files/gridgen_examples_3_0.png
+
+
+Basic Estuary
+~~~~~~~~~~~~~
+
+.. code:: python
+
+    x, y, beta, ul_idx = read_boundary(0)
+    grid = pygridgen.Gridgen(x, y, beta, ul_idx=ul_idx, shape=(90, 120))
+    
+    fig, ax = pyplot.subplots(figsize=(10, 10))
+    plot_grid(grid, ax=ax)
+
+
+
+.. image:: gridgen_examples_files/gridgen_examples_5_0.png
+
+
+These are just weird
+~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    fig, axes = pyplot.subplots(figsize=(15, 7), ncols=2)
+    shapes = [(40, 125), (40, 80)]
+    for n, (shape, ax) in enumerate(zip(shapes, axes), 3):
+        x, y, beta, ul_idx = read_boundary(n)
+        grid = pygridgen.Gridgen(x, y, beta, ul_idx=ul_idx, shape=(40, 125))
+        plot_grid(grid, ax=ax)
+
+
+
+.. image:: gridgen_examples_files/gridgen_examples_7_0.png
+
+
+.. code:: python
+
+    x, y, beta, ul_idx = read_boundary(5)
+    grid = pygridgen.Gridgen(x, y, beta, ul_idx=ul_idx, shape=(31, 31))
+    
+    fig, ax = pyplot.subplots(figsize=(10, 10))
+    plot_grid(grid, ax=ax)
+
+
+
+.. image:: gridgen_examples_files/gridgen_examples_8_0.png
+

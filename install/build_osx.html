@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Mac OS X: building from source &mdash; pygridgen 0.2.0 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="pygridgen 0.2.0 documentation" href="../index.html"/>
+        <link rel="next" title="Basic grid generation" href="../tutorial/basics.html"/>
+        <link rel="prev" title="Linux: Building from source" href="build_linux.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="../index.html" class="fa fa-home"> pygridgen</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="simple">
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="conda.html">Installation via conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build_linux.html">Linux: Building from source</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="build_linux.html#basic-linux-stuff">Basic linux stuff</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_linux.html#getting-miniconda-and-creating-an-environment">Getting miniconda and creating an environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_linux.html#cloning-dependencies-from-github">Cloning dependencies from github</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_linux.html#building-c-c-dependencies">Building C/C++ dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_linux.html#install-pygridgen">Install pygridgen</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Mac OS X: building from source</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-stuff">Basic stuff</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-miniconda-and-creating-an-environment">Getting miniconda and creating an environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cloning-dependencies-from-github">Cloning dependencies from github</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-c-c-dependencies">Building C/C++ dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-pygridgen">Install pygridgen</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/basics.html">Basic grid generation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/basics.html#side-channels-using">Side channels: using <span class="math">\(\beta = -1\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/basics.html#using-focus">Using focus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/basics.html#on-the-upper-left-index-parameter">On the upper left index parameter</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/gridgen_examples.html">Examples from the gridgen-c library</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/gridgen_examples.html#sensitivity-to">Sensitivity to <span class="math">\(\beta\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/gridgen_examples.html#basic-estuary">Basic Estuary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorial/gridgen_examples.html#these-are-just-weird">These are just weird</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/grid.html">The <cite>pygridgen</cite> API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/csa.html">The <cite>csa</cite> API</a></li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">pygridgen</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>Mac OS X: building from source</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="../_sources/install/build_osx.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="mac-os-x-building-from-source">
+<h1>Mac OS X: building from source<a class="headerlink" href="#mac-os-x-building-from-source" title="Permalink to this headline">¶</a></h1>
+<p>Building <code class="docutils literal"><span class="pre">pygridgen</span></code> and its dependencies from source should be
+pretty straight-forward. Here&#8217;s a bare bones guide that was last tested
+on Lion.</p>
+<div class="section" id="basic-stuff">
+<h2>Basic stuff<a class="headerlink" href="#basic-stuff" title="Permalink to this headline">¶</a></h2>
+<p>You probably need XCode and the XCode command line stuff installed. Get
+XCode from the Mac App store and setup the command line tools from
+within XCode or from the command line itself.</p>
+<p><a class="reference external" href="http://osxdaily.com/2014/02/12/install-command-line-tools-mac-os-x/">http://osxdaily.com/2014/02/12/install-command-line-tools-mac-os-x/</a></p>
+</div>
+<div class="section" id="getting-miniconda-and-creating-an-environment">
+<h2>Getting miniconda and creating an environment<a class="headerlink" href="#getting-miniconda-and-creating-an-environment" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>$ wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+$ chmod +x miniconda.sh
+$ ./miniconda.sh -b -p $HOME/miniconda
+$ export PATH=$HOME/miniconda/bin:$PATH
+$ conda update --yes conda
+$ conda create --name=grid python=3.5 pip nose matplotlib numpy --yes
+$ source activate grid
+</pre></div>
+</div>
+<div class="section" id="dealing-with-projected-data">
+<h3>Dealing with projected data:<a class="headerlink" href="#dealing-with-projected-data" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>$ conda install --channel=IOOS pyproj --yes
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="cloning-dependencies-from-github">
+<h2>Cloning dependencies from github<a class="headerlink" href="#cloning-dependencies-from-github" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>$ mkdir gridlibs &amp;&amp; cd gridlibs
+$ # C libraries
+$ git clone https://github.com/sakov/nn-c.git
+$ git clone https://github.com/sakov/csa-c.git
+$ git clone https://github.com/sakov/gridutils-c.git
+$ git clone https://github.com/sakov/gridgen-c.git
+$ # python library
+$ git clone https://github.com/phobson/pygridgen.git
+</pre></div>
+</div>
+</div>
+<div class="section" id="building-c-c-dependencies">
+<h2>Building C/C++ dependencies<a class="headerlink" href="#building-c-c-dependencies" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="natural-neighbors">
+<h3>natural neighbors<a class="headerlink" href="#natural-neighbors" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>$ cd nn
+$ ./configure
+$ make clean
+$ sudo make install
+$ cd ..
+</pre></div>
+</div>
+</div>
+<div class="section" id="csa">
+<h3>csa<a class="headerlink" href="#csa" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>$ cd csa
+$ ./configure
+$ make clean
+$ sudo make install
+$ cd ..
+</pre></div>
+</div>
+</div>
+<div class="section" id="gridutils">
+<h3>gridutils<a class="headerlink" href="#gridutils" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>$ cd gridutils
+$ ./configure
+$ make clean
+$ sudo make install
+$ cd ..
+</pre></div>
+</div>
+</div>
+<div class="section" id="gridgen-c">
+<h3>gridgen-C<a class="headerlink" href="#gridgen-c" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>$ cd gridgen
+$ ./configure
+$ make clean
+$ sudo make lib
+$ sudo make shlib
+$ sudo make install
+$ cd ..
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="install-pygridgen">
+<h2>Install pygridgen<a class="headerlink" href="#install-pygridgen" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>$ cd pygridgen
+$ source activate gridgen
+$ pip install .
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../tutorial/basics.html" class="btn btn-neutral float-right" title="Basic grid generation">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="build_linux.html" class="btn btn-neutral" title="Linux: Building from source"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Robert Hetland.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
