@@ -1,95 +1,102 @@
-# Setting up a fresh linux box for grid generation
 
-## Basics linux stuff
-```
-$ sudo apt-get update && sudo apt-get upgrade
-$ sudo apt-get autoremove libreoffice-common
-$ sudo apt-get install git vim build-essential gfortran
-```
+Linux: Building from source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## Getting miniconda and creating an environment
-```
-$ wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-$ chmod +x miniconda.sh
-$ ./miniconda.sh -b
-$ export PATH=/home/grid/miniconda/bin:$PATH
-$ conda update conda
-$ conda create --name=gridgen python=2.7 pip nose matplotlib numpy --yes
-$ source activate gridgen
-```
+Building ``pygridgen`` and it's dependencies from source should be
+pretty straight-forward. Here's a bare bones guide (assuming an Ubuntu-ish distro).
 
-### Dealing with projected data:
-If you're on 64-bit linux:
+Basic linux stuff
+^^^^^^^^^^^^^^^^^
 
-```
-$ conda install -c https://conda.binstar.org/rsignell pyproj --yes
-```
+::
 
-Or if you're on 32-bit linux:
-```
-$ conda install basemap --yes
-```
+    $ sudo apt-get update && sudo apt-get upgrade
+    $ sudo apt-get autoremove libreoffice-common
+    $ sudo apt-get install git vim build-essential gfortran
 
-## Cloning repos from github
+Getting miniconda and creating an environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-```
-$ mkdir sources && cd sources
-$ git clone https://github.com/geosyntec/pygridgen.git
-```
+::
 
-## Building C/C++ dependencies
+    $ wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+    $ chmod +x miniconda.sh
+    $ ./miniconda.sh -b -p $HOME/miniconda
+    $ export PATH=$HOME/miniconda/bin:$PATH
+    $ conda update --yes conda
+    $ conda create --name=grid python=3.5 pip nose matplotlib numpy --yes
+    $ source activate grid
 
-`$ cd pygridgen/external`
+Dealing with projected data:
+''''''''''''''''''''''''''''
 
-### nearest neighbors
-```
-$ cd nn
-$ ./configure && sudo make install
-$ cd ..
-```
+::
 
-### CSA
-```
-$ cd csa
-$ ./configure && sudo make install
-$ cd ..
-```
+    $ conda install --channel=IOOS pyproj --yes
 
-### gridutils
-```
-$ cd gridutils
-$ ./configure
-```
+Cloning dependencies from github
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Edit the `makefile` and change this (line ~31):
+::
 
-`CFLAGS = -g -O2 -Wall -pedantic`
+    $ mkdir gridlibs && cd gridlibs
+    $ # C libraries
+    $ git clone https://github.com/sakov/nn-c.git
+    $ git clone https://github.com/sakov/csa-c.git
+    $ git clone https://github.com/sakov/gridutils-c.git
+    $ git clone https://github.com/sakov/gridgen-c.git
+    $ # python library
+    $ git clone https://github.com/phobson/pygridgen.git
 
-To this:
+Building C/C++ dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-`CFLAGS = -g -O2 -Wall -pedantic -fPIC`
+natural neighbors
+'''''''''''''''''
 
-After doing this, do *not* run `./configure` again
+::
 
-```
-$ sudo make install
-$ cd ..
-```
+    $ cd nn
+    $ ./configure && sudo make install
+    $ cd ..
 
-### gridgen-C
-```
-$ cd gridgen
-$ ./configure
-$ sudo make
-$ sudo make lib
-$ sudo make shlib
-$ sudo make install
-$ cd ..
-```
+csa
+'''
 
-## Install pygridgen
-```
-$ cd ~/sources/pygridgen
-$ source activate gridgen
-$ python setup.py install
-```
+::
+
+    $ cd csa
+    $ ./configure && sudo make install
+    $ cd ..
+
+gridutils
+'''''''''
+
+::
+
+    $ cd gridutils
+    $ ./configure CFLAGS="-g -O2 -Wall -pedantic -fPIC"
+    $ sudo make install
+    $ cd ..
+
+gridgen-C
+'''''''''
+
+::
+
+    $ cd gridgen
+    $ ./configure
+    $ sudo make
+    $ sudo make lib
+    $ sudo make shlib
+    $ sudo make install
+    $ cd ..
+
+Install pygridgen
+^^^^^^^^^^^^^^^^^
+
+::
+
+    $ cd pygridgen
+    $ source activate gridgen
+    $ pip install .

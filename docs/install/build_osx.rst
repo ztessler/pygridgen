@@ -1,90 +1,108 @@
-# Setting up a  Mac OS X machine for grid generation
-(tested on Lion)
 
-## Basics stuff
-You probably need XCode and the XCode command line stuff installed.
-Get XCode from the Mac App store and setup the command line tools
-from within XCode or from the command line itself.
+Mac OS X: building from source
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Building ``pygridgen`` and its dependencies from source should be
+pretty straight-forward. Here's a bare bones guide that was last tested
+on Lion.
+
+Basic stuff
+^^^^^^^^^^^
+
+You probably need XCode and the XCode command line stuff installed. Get
+XCode from the Mac App store and setup the command line tools from
+within XCode or from the command line itself.
 
 http://osxdaily.com/2014/02/12/install-command-line-tools-mac-os-x/
 
+Getting miniconda and creating an environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-## Getting miniconda and creating an environment
-```
-$ wget http://repo.continuum.io/miniconda/Miniconda3-3.7.3-MacOSX-x86_64.sh -O miniconda.sh
-$ chmod +x miniconda.sh
-$ ./miniconda.sh -b
-$ export PATH=/home/grid/miniconda/bin:$PATH  # you'll probably want to do this permanently
-$ conda update conda
-$ conda create --name=gridgen python=2.7 pip nose matplotlib numpy --yes
-$ source activate gridgen
-```
+::
 
-### Dealing with projected data:
+    $ wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+    $ chmod +x miniconda.sh
+    $ ./miniconda.sh -b -p $HOME/miniconda
+    $ export PATH=$HOME/miniconda/bin:$PATH
+    $ conda update --yes conda
+    $ conda create --name=grid python=3.5 pip nose matplotlib numpy --yes
+    $ source activate grid
 
-```
-$ conda install -c https://conda.binstar.org/asmeurer pyproj --yes
-```
+Dealing with projected data:
+''''''''''''''''''''''''''''
 
-Or for more adavanced map-related plotting:
+::
 
-```
-$ conda install basemap --yes
-```
+    $ conda install --channel=IOOS pyproj --yes
 
-## Cloning repos from github
+Cloning dependencies from github
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-```
-$ mkdir sources && cd sources
-$ git clone https://github.com/geosyntec/pygridgen.git
-```
+::
 
-## Building C/C++ dependencies
+    $ mkdir gridlibs && cd gridlibs
+    $ # C libraries
+    $ git clone https://github.com/sakov/nn-c.git
+    $ git clone https://github.com/sakov/csa-c.git
+    $ git clone https://github.com/sakov/gridutils-c.git
+    $ git clone https://github.com/sakov/gridgen-c.git
+    $ # python library
+    $ git clone https://github.com/phobson/pygridgen.git
 
-`$ cd pygridgen/external`
+Building C/C++ dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-### nearest neighbors
-```
-$ cd nn
-$ ./configure
-$ make clean
-$ sudo make install
-$ cd ..
-```
+natural neighbors
+'''''''''''''''''
 
-### CSA
-```
-$ cd csa
-$ ./configure
-$ make clean
-$ sudo make install
-$ cd ..
-```
+::
 
-### gridutils
-```
-$ cd gridutils
-$ ./configure
-$ make clean
-$ sudo make install
-$ cd ..
-```
+    $ cd nn
+    $ ./configure
+    $ make clean
+    $ sudo make install
+    $ cd ..
 
-### gridgen-C
-```
-$ cd gridgen
-$ ./configure
-$ make clean
-$ sudo make
-$ sudo make lib
-$ sudo make shlib
-$ sudo make install
-$ cd ..
-```
+csa
+'''
 
-## Install pygridgen
-```
-$ cd ~/sources/pygridgen
-$ source activate gridgen
-$ python setup.py install
-```
+::
+
+    $ cd csa
+    $ ./configure
+    $ make clean
+    $ sudo make install
+    $ cd ..
+
+gridutils
+'''''''''
+
+::
+
+    $ cd gridutils
+    $ ./configure
+    $ make clean
+    $ sudo make install
+    $ cd ..
+
+gridgen-C
+'''''''''
+
+::
+
+    $ cd gridgen
+    $ ./configure
+    $ make clean
+    $ sudo make lib
+    $ sudo make shlib
+    $ sudo make install
+    $ cd ..
+
+Install pygridgen
+^^^^^^^^^^^^^^^^^
+
+::
+
+    $ cd pygridgen
+    $ source activate gridgen
+    $ pip install .
