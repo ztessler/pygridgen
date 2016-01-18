@@ -22,7 +22,7 @@ see the documentation for `pygridtools`_.
 
 Credits
 -------
-This fork of ``pygridgen`` stands on the very tall shoulders of `Robert Hetland`_ of Texam A&M Universits.
+This fork of ``pygridgen`` stands on the very tall shoulders of `Robert Hetland`_ of Texas A&M University.
 Many thanks to him, `Richard Signell`_, `Fillipe Fernandes`_, and all of the other contributors.
 
 .. _Robert Hetland: https://github.com/hetland
@@ -36,7 +36,7 @@ Python Dependencies
 Basics
 ~~~~~~
 
-Provided that all of the shared C libraries are installed as covered in per the instructions below, the remaining python depedencies are the following:
+Provided that all of the shared C libraries are installed, the remaining python depedencies are the following:
 
 * numpy
 * matplotlib
