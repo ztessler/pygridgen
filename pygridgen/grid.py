@@ -783,8 +783,10 @@ class Gridgen(CGrid):
 
         # find the gridgen-c shared library
         libgridgen_paths = [
+            ('libgridgen.so', os.path.join(sys.prefix, 'lib')),
             ('libgridgen', os.path.join(sys.prefix, 'lib')),
-            ('libgridgen', '/usr/local/lib')
+            ('libgridgen.so', '/usr/local/lib'),
+            ('libgridgen', '/usr/local/lib'),
         ]
 
         for name, path in libgridgen_paths:
