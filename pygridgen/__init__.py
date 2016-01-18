@@ -13,6 +13,7 @@ Released under an MIT license.
 '''
 
 from .grid import *
+from . import csa
 from .boundary_interactor import *
 
 __authors__ = ['Robert Hetland <hetland@tamu.edu>',

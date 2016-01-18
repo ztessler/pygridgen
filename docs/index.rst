@@ -29,6 +29,7 @@ API Reference
    :maxdepth: 2
 
    api/grid.rst
+   api/csa.rst
 
 
 Indices and tables
