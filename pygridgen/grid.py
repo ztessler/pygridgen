@@ -13,7 +13,7 @@ import numpy as np
 from matplotlib.path import Path
 
 
-def points_inside_poly(points, verts):
+def _points_inside_poly(points, verts):
     poly = Path(verts)
     return [ind for ind, p in enumerate(points) if poly.contains_point(p)]
 
@@ -585,7 +585,7 @@ class CGrid(object):
             raise ValueError('polyverts must contain at least 3 points')
 
         mask = self.mask_rho.copy()
-        inside = points_inside_poly(
+        inside = _points_inside_poly(
             np.vstack([self.x_rho.flatten(), self.y_rho.flatten()]).T,
             polyverts
         )
