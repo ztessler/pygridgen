@@ -297,8 +297,8 @@ class test_Grid_with_focus(_gridMixin):
         self.shape = (9, 9)
 
         focus = pygridgen.Focus()
-        focus.add_focus_x(0.50, factor=2.0, Rx=3.0)
-        focus.add_focus_y(0.75, factor=0.5, Ry=2.0)
+        focus.add_focus(0.50, 'x', factor=2.0, extent=3.0)
+        focus.add_focus(0.75, 'y', factor=0.5, extent=2.0)
         self.options.update({'ul_idx': 0, 'focus': focus})
 
         self.grid = self.make_grid()
