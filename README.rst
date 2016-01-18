@@ -1,9 +1,9 @@
 `pygridgen`
 ===========
-.. image:: https://travis-ci.org/phobson/pygridgen.svg?branch=master
+.. image:: https://travis-ci.org/phobson/pygridgen.svg?branch=develop
     :target: https://travis-ci.org/phobson/pygridgen
-.. image:: https://coveralls.io/repos/phobson/pygridgen/badge.svg?branch=use-properties-CGrid&service=github
-  :target: https://coveralls.io/github/phobson/pygridgen?branch=use-properties-CGrid
+.. image:: https://coveralls.io/repos/phobson/pygridgen/badge.svg?branch=develop&service=github
+  :target: https://coveralls.io/github/phobson/pygridgen?branch=develop
 
 
 A Python interface to Pavel Sakov's `gridgen`_ library
