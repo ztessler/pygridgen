@@ -789,9 +789,9 @@ class Gridgen(CGrid):
             ('libgridgen', '/usr/local/lib'),
         ]
 
-        for path in libgridgen_paths:
+        for name, path in libgridgen_paths:
             try:
-                self._libgridgen = np.ctypeslib.load_library('libgridgen.so', path)
+                self._libgridgen = np.ctypeslib.load_library(name, path)
                 break
             except OSError:
                 pass
