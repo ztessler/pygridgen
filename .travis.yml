@@ -10,6 +10,9 @@ matrix:
         - COVERAGE=false
     - python: 3.4
       env:
+        - COVERAGE=false
+    - python: 3.5
+      env:
         - COVERAGE=true
 
 before_install:
@@ -21,28 +24,9 @@ before_install:
   - conda update --yes conda
 
 install:
-  - conda update conda --yes
   - conda create --name testenv --yes python=$TRAVIS_PYTHON_VERSION numpy matplotlib nose pyyaml requests docopt coverage
   - source activate testenv
-  - conda config --add channels JimInCO
-  - conda install --yes pyproj
-  - cd external/nn
-  - ./configure
-  - sudo make install
-  - cd ../csa
-  - ./configure
-  - sudo make install
-  - cd ../gridutils
-  - ./configure
-  - sed -i 's/CFLAGS = -g -O2 -Wall -pedantic/CFLAGS = -g -O2 -Wall -pedantic -fPIC/g' makefile
-  - sudo make install
-  - cd ../gridgen
-  - ./configure
-  - sudo make
-  - sudo make lib
-  - sudo make shlib
-  - sudo make install
-  - cd ../..
+  - conda install --yes pyproj gridgen --channel=IOOS
   - pip install .
   - pip install coveralls
 
