@@ -1,17 +1,24 @@
-.. pygridgen documentation master file, created by
-   sphinx-quickstart on Sat Jan 16 18:37:00 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to pygridgen's documentation!
-=====================================
-
-Contents:
+.. include:: ../readme.rst
 
 .. toctree::
    :maxdepth: 2
 
+Installation
+------------
+   install/conda.rst
+   install/build_linux.rst
+   install/build_mac.rst
 
+
+Tutorials
+---------
+   tutorial/overview
+   tutorial/fitting
+
+API Reference
+-------------
+   api/grid.rst
+   api/csa.rst
 
 Indices and tables
 ==================
