@@ -146,9 +146,9 @@ class test_Focus(object):
             [1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   ]
         ])
 
-        self.focus.add_focus(0.25, 'x', factor=3, Rx=0.1)
-        self.focus.add_focus(0.75, 'x', factor=2, Rx=0.2)
-        self.focus.add_focus(0.50, 'y', factor=2, Ry=0.3)
+        self.focus.add_focus(0.25, 'x', factor=3, extent=0.1)
+        self.focus.add_focus(0.75, 'x', factor=2, extent=0.2)
+        self.focus.add_focus(0.50, 'y', factor=2, extent=0.3)
 
     def test__focuspoints(self):
         nt.assert_true(hasattr(self.focus, '_focuspoints'))
@@ -156,14 +156,14 @@ class test_Focus(object):
         nt.assert_equal(len(self.focus._focuspoints), 3)
 
     def test_add_focus_x(self):
-        self.focus.add_focus(0.99, 'x', factor=3, Rx=0.1)
+        self.focus.add_focus(0.99, 'x', factor=3, extent=0.1)
         nt.assert_true(len(self.focus._focuspoints), 4)
         nt.assert_true(isinstance(self.focus._focuspoints[-1], pygridgen.grid._FocusPoint))
         nt.assert_equal(self.focus._focuspoints[-1].pos, 0.99)
         nt.assert_equal(self.focus._focuspoints[-1].axis, 'x')
 
     def test_add_focus_y(self):
-        self.focus.add_focus(0.99, 'y', factor=3, Ry=0.1)
+        self.focus.add_focus(0.99, 'y', factor=3, extent=0.1)
         nt.assert_true(len(self.focus._focuspoints), 4)
         nt.assert_true(isinstance(self.focus._focuspoints[-1], pygridgen.grid._FocusPoint))
         nt.assert_equal(self.focus._focuspoints[-1].pos, 0.99)
