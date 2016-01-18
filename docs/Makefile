@@ -48,12 +48,6 @@ help:
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 	@echo "  coverage   to run coverage check of the documentation (if enabled)"
 
-notebooks:
-	tools/nb_to_doc.py tutorial/basics
-	tools/nb_to_doc.py tutorial/gridgen_examples
-	tools/nb_to_doc.py install/build_linux
-	tools/nb_to_doc.py install/build_oxs
-
 clean:
 	rm -rf $(BUILDDIR)/*
 
