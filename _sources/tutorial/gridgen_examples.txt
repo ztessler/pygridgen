@@ -6,6 +6,10 @@ These are some examples from the original ``gridgen-c`` library.
 
 .. code:: python
 
+    %matplotlib inline
+
+.. code:: python
+
     import warnings
     warnings.simplefilter('ignore')
     
@@ -17,7 +21,6 @@ These are some examples from the original ``gridgen-c`` library.
     seaborn.set(style='ticks', context='notebook', rc=clear_bkgd)
     
     import pygridgen
-    %matplotlib inline
     
     def plot_grid(grid, ax):
         ax.plot(grid.x.flatten(), grid.y.flatten(), 'k.', label='Grid nodes', zorder=5)
@@ -57,7 +60,7 @@ channel and alters the layout of the whole grid.
 
 
 
-.. image:: gridgen_examples_files/gridgen_examples_3_0.png
+.. image:: gridgen_examples_files/gridgen_examples_4_0.png
 
 
 Basic Estuary
@@ -73,7 +76,7 @@ Basic Estuary
 
 
 
-.. image:: gridgen_examples_files/gridgen_examples_5_0.png
+.. image:: gridgen_examples_files/gridgen_examples_6_0.png
 
 
 These are just weird
@@ -90,7 +93,7 @@ These are just weird
 
 
 
-.. image:: gridgen_examples_files/gridgen_examples_7_0.png
+.. image:: gridgen_examples_files/gridgen_examples_8_0.png
 
 
 .. code:: python
@@ -103,5 +106,5 @@ These are just weird
 
 
 
-.. image:: gridgen_examples_files/gridgen_examples_8_0.png
+.. image:: gridgen_examples_files/gridgen_examples_9_0.png
 

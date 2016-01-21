@@ -139,36 +139,38 @@
   <div class="section" id="examples-from-the-gridgen-c-library">
 <h1>Examples from the gridgen-c library<a class="headerlink" href="#examples-from-the-gridgen-c-library" title="Permalink to this headline">¶</a></h1>
 <p>These are some examples from the original <code class="docutils literal"><span class="pre">gridgen-c</span></code> library.</p>
-<div class="code python highlight-python"><div class="highlight"><pre>import warnings
-warnings.simplefilter(&#39;ignore&#39;)
+<div class="code python highlight-python"><div class="highlight"><pre>%matplotlib inline
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s">&#39;ignore&#39;</span><span class="p">)</span>
 
-import numpy
-from matplotlib import pyplot
-import pandas
-import seaborn
-clear_bkgd = {&#39;axes.facecolor&#39;:&#39;none&#39;, &#39;figure.facecolor&#39;:&#39;none&#39;}
-seaborn.set(style=&#39;ticks&#39;, context=&#39;notebook&#39;, rc=clear_bkgd)
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">seaborn</span>
+<span class="n">clear_bkgd</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;axes.facecolor&#39;</span><span class="p">:</span><span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="s">&#39;figure.facecolor&#39;</span><span class="p">:</span><span class="s">&#39;none&#39;</span><span class="p">}</span>
+<span class="n">seaborn</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s">&#39;ticks&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s">&#39;notebook&#39;</span><span class="p">,</span> <span class="n">rc</span><span class="o">=</span><span class="n">clear_bkgd</span><span class="p">)</span>
 
-import pygridgen
-%matplotlib inline
+<span class="kn">import</span> <span class="nn">pygridgen</span>
 
-def plot_grid(grid, ax):
-    ax.plot(grid.x.flatten(), grid.y.flatten(), &#39;k.&#39;, label=&#39;Grid nodes&#39;, zorder=5)
-    ax.set_aspect(&#39;equal&#39;)
-    ax.plot(grid.xbry, grid.ybry, &#39;-&#39;, color=&#39;0.5&#39;, zorder=0)
-    pos = numpy.nonzero(grid.beta &gt; 0)
-    neg = numpy.nonzero(grid.beta &lt; 0)
+<span class="k">def</span> <span class="nf">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">grid</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="s">&#39;k.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Grid nodes&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s">&#39;equal&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">xbry</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">ybry</span><span class="p">,</span> <span class="s">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;0.5&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">beta</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">neg</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">beta</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
 
-    ax.plot(x[pos], y[pos], &#39;go&#39;, label=&#39;Positive&#39;, zorder=2, alpha=0.5)
-    ax.plot(x[neg], y[neg], &#39;rs&#39;, label=&#39;Negative&#39;, zorder=2, alpha=0.5)
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">pos</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">pos</span><span class="p">],</span> <span class="s">&#39;go&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Positive&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">neg</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">neg</span><span class="p">],</span> <span class="s">&#39;rs&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Negative&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
-    ax.legend(numpoints=1, loc=&#39;lower left&#39;)
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">numpoints</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s">&#39;lower left&#39;</span><span class="p">)</span>
 
-def read_boundary(example):
-    df = pandas.read_table(&quot;gg_examples/xy.{}&quot;.format(example), sep=&#39;\s+&#39;).fillna(0)
-    x, y, beta = df[&#39;x&#39;].values, df[&#39;y&#39;].values, df[&#39;b&#39;].values
-    ul_idx = numpy.nonzero(df[&#39;ul&#39;])[0][0]
-    return x, y, beta, ul_idx
+<span class="k">def</span> <span class="nf">read_boundary</span><span class="p">(</span><span class="n">example</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="s">&quot;gg_examples/xy.{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">example</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;\s+&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s">&#39;b&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">ul_idx</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">&#39;ul&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">ul_idx</span>
 </pre></div>
 </div>
 <div class="section" id="sensitivity-to">
@@ -186,7 +188,7 @@ channel and alters the layout of the whole grid.</p>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=-</span><span class="mf">1.25</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">2.50</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/gridgen_examples_3_0.png" src="../_images/gridgen_examples_3_0.png" />
+<img alt="../_images/gridgen_examples_4_0.png" src="../_images/gridgen_examples_4_0.png" />
 </div>
 <div class="section" id="basic-estuary">
 <h2>Basic Estuary<a class="headerlink" href="#basic-estuary" title="Permalink to this headline">¶</a></h2>
@@ -197,7 +199,7 @@ channel and alters the layout of the whole grid.</p>
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/gridgen_examples_5_0.png" src="../_images/gridgen_examples_5_0.png" />
+<img alt="../_images/gridgen_examples_6_0.png" src="../_images/gridgen_examples_6_0.png" />
 </div>
 <div class="section" id="these-are-just-weird">
 <h2>These are just weird<a class="headerlink" href="#these-are-just-weird" title="Permalink to this headline">¶</a></h2>
@@ -209,7 +211,7 @@ channel and alters the layout of the whole grid.</p>
     <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/gridgen_examples_7_0.png" src="../_images/gridgen_examples_7_0.png" />
+<img alt="../_images/gridgen_examples_8_0.png" src="../_images/gridgen_examples_8_0.png" />
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">ul_idx</span> <span class="o">=</span> <span class="n">read_boundary</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">grid</span> <span class="o">=</span> <span class="n">pygridgen</span><span class="o">.</span><span class="n">Gridgen</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">ul_idx</span><span class="o">=</span><span class="n">ul_idx</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span> <span class="mi">31</span><span class="p">))</span>
 
@@ -217,7 +219,7 @@ channel and alters the layout of the whole grid.</p>
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/gridgen_examples_8_0.png" src="../_images/gridgen_examples_8_0.png" />
+<img alt="../_images/gridgen_examples_9_0.png" src="../_images/gridgen_examples_9_0.png" />
 </div>
 </div>
 

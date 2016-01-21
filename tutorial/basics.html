@@ -138,31 +138,33 @@
             
   <div class="section" id="basic-grid-generation">
 <h1>Basic grid generation<a class="headerlink" href="#basic-grid-generation" title="Permalink to this headline">¶</a></h1>
-<div class="code python highlight-python"><div class="highlight"><pre>import warnings
-warnings.simplefilter(&#39;ignore&#39;)
+<div class="code python highlight-python"><div class="highlight"><pre>%matplotlib inline
+</pre></div>
+</div>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s">&#39;ignore&#39;</span><span class="p">)</span>
 
-import numpy
-from matplotlib import pyplot
-import seaborn
-clear_bkgd = {&#39;axes.facecolor&#39;:&#39;none&#39;, &#39;figure.facecolor&#39;:&#39;none&#39;}
-seaborn.set(style=&#39;ticks&#39;, context=&#39;notebook&#39;, rc=clear_bkgd)
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>
+<span class="kn">import</span> <span class="nn">seaborn</span>
+<span class="n">clear_bkgd</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;axes.facecolor&#39;</span><span class="p">:</span><span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="s">&#39;figure.facecolor&#39;</span><span class="p">:</span><span class="s">&#39;none&#39;</span><span class="p">}</span>
+<span class="n">seaborn</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s">&#39;ticks&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s">&#39;notebook&#39;</span><span class="p">,</span> <span class="n">rc</span><span class="o">=</span><span class="n">clear_bkgd</span><span class="p">)</span>
 
-import pygridgen
-%matplotlib inline
+<span class="kn">import</span> <span class="nn">pygridgen</span>
 
-def plot_grid(grid, ax):
-    ax.plot(grid.x.flatten(), grid.y.flatten(), &#39;k.&#39;, label=&#39;Grid nodes&#39;, zorder=5)
-    ax.set_aspect(&#39;equal&#39;)
-    ax.set_xlim([0, 4])
-    ax.set_ylim([0, 4])
-    ax.plot(grid.xbry, grid.ybry, &#39;-&#39;, color=&#39;0.5&#39;, zorder=0)
-    pos = numpy.nonzero(grid.beta == 1)
-    neg = numpy.nonzero(grid.beta == -1)
+<span class="k">def</span> <span class="nf">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">grid</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="s">&#39;k.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Grid nodes&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s">&#39;equal&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">xbry</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">ybry</span><span class="p">,</span> <span class="s">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;0.5&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">beta</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">neg</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">beta</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-    ax.plot(x[pos], y[pos], &#39;go&#39;, label=&#39;Positive&#39;, zorder=2, alpha=0.5)
-    ax.plot(x[neg], y[neg], &#39;rs&#39;, label=&#39;Negative&#39;, zorder=2, alpha=0.5)
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">pos</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">pos</span><span class="p">],</span> <span class="s">&#39;go&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Positive&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">neg</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">neg</span><span class="p">],</span> <span class="s">&#39;rs&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Negative&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
-    ax.legend(numpoints=1)
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">numpoints</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Two basic quantities define the domain of a grid: the boundary
@@ -193,7 +195,7 @@ in the grid as two-tuple called <code class="docutils literal"><span class="pre"
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_3_0.png" src="../_images/basics_3_0.png" />
+<img alt="../_images/basics_4_0.png" src="../_images/basics_4_0.png" />
 <p>Without dramatically changing anything, we can add a neutral point to
 make a pentagon.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
@@ -205,7 +207,7 @@ make a pentagon.</p>
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_5_0.png" src="../_images/basics_5_0.png" />
+<img alt="../_images/basics_6_0.png" src="../_images/basics_6_0.png" />
 <div class="section" id="side-channels-using">
 <h2>Side channels: using <span class="math">\(\beta = -1\)</span><a class="headerlink" href="#side-channels-using" title="Permalink to this headline">¶</a></h2>
 <p>If you have complex shapes with side channels, and don&#8217;t define an
@@ -221,7 +223,7 @@ channel.</p>
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_7_0.png" src="../_images/basics_7_0.png" />
+<img alt="../_images/basics_8_0.png" src="../_images/basics_8_0.png" />
 <p>The first thing we might try, is put two of the <span class="math">\(\beta = +1\)</span>
 values in the out corners of the side channel. But, again, this really
 isn&#8217;t want we want</p>
@@ -232,7 +234,7 @@ isn&#8217;t want we want</p>
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_9_0.png" src="../_images/basics_9_0.png" />
+<img alt="../_images/basics_10_0.png" src="../_images/basics_10_0.png" />
 <p>The trick here is to use <span class="math">\(\beta = -1\)</span> to define the left channel
 as a side channel, which tells the grid generator to squeeze in there a
 little more naturally. Note that if we add to points that atre
@@ -245,7 +247,7 @@ domain &#8220;square&#8221; (i.e., <span class="math">\(\sum \beta = 4\)</span>)
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_11_0.png" src="../_images/basics_11_0.png" />
+<img alt="../_images/basics_12_0.png" src="../_images/basics_12_0.png" />
 <p>There, now we have a lovely, uniform grid throughout the domain.</p>
 </div>
 <div class="section" id="using-focus">
@@ -262,7 +264,7 @@ y-direction?</p>
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_14_0.png" src="../_images/basics_14_0.png" />
+<img alt="../_images/basics_15_0.png" src="../_images/basics_15_0.png" />
 <p>One option would be to take a brute-force approach and increase the grid
 resolution until we have 4 nodes in the side channel.</p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">grid</span> <span class="o">=</span> <span class="n">pygridgen</span><span class="o">.</span><span class="n">Gridgen</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
@@ -271,7 +273,7 @@ resolution until we have 4 nodes in the side channel.</p>
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_16_0.png" src="../_images/basics_16_0.png" />
+<img alt="../_images/basics_17_0.png" src="../_images/basics_17_0.png" />
 <p>For such a simple case, this would be fine. However, in more complex
 models, this could dramatically increase the computational burden of the
 model. Instead, we could make the <em>y-</em>resolution of the nodes more
@@ -306,15 +308,14 @@ use use <code class="docutils literal"><span class="pre">factor</span> <span cla
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_18_0.png" src="../_images/basics_18_0.png" />
+<img alt="../_images/basics_19_0.png" src="../_images/basics_19_0.png" />
 <p>The interactions between <code class="docutils literal"><span class="pre">factor</span></code> and <code class="docutils literal"><span class="pre">extent</span></code> can be tricky. The
 example above applies a 5x focus to the middle 25% of the grid
 (<code class="docutils literal"><span class="pre">extent</span> <span class="pre">=</span> <span class="pre">0.25</span></code>). However, if we instead apply the focus to 50% of
 the grid, we no longer achieve our goal of having 3 nodes in the side
 channel.</p>
-<p><code class="docutils literal"><span class="pre">¯\_(ツ)_/¯</span></code></p>
 <div class="code python highlight-python"><div class="highlight"><pre><span class="n">focus</span> <span class="o">=</span> <span class="n">pygridgen</span><span class="o">.</span><span class="n">Focus</span><span class="p">()</span>
-<span class="n">focus</span><span class="o">.</span><span class="n">add_focus</span><span class="p">(</span><span class="mf">0.50</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="n">focus</span><span class="o">.</span><span class="n">add_focus</span><span class="p">(</span><span class="mf">0.50</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="mf">0.50</span><span class="p">)</span>
 
 <span class="n">grid</span> <span class="o">=</span> <span class="n">pygridgen</span><span class="o">.</span><span class="n">Gridgen</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="n">focus</span><span class="o">=</span><span class="n">focus</span><span class="p">)</span>
 
@@ -322,7 +323,8 @@ channel.</p>
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_20_0.png" src="../_images/basics_20_0.png" />
+<img alt="../_images/basics_21_0.png" src="../_images/basics_21_0.png" />
+<p><code class="docutils literal"><span class="pre">¯\_(ツ)_/¯</span></code></p>
 <p>So now, let&#8217;s make the horizontal resolution of the main body more
 sparse by using a <code class="docutils literal"><span class="pre">factor</span> <span class="pre">&lt;</span> <span class="pre">1</span></code>. This will have the side-effect of make
 the horizontal channel more dense.</p>
@@ -342,7 +344,7 @@ they&#8217;re half as dense:</p>
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_22_0.png" src="../_images/basics_22_0.png" />
+<img alt="../_images/basics_23_0.png" src="../_images/basics_23_0.png" />
 <p>Wait second, the <em>side channel</em> got less dense. What&#8217;s going?</p>
 <p>Well, we avoiding this successfully so far, but it finally bit us. By
 default, <code class="docutils literal"><span class="pre">pygridgen</span></code> assumes that the first coordinate pair of the
@@ -360,7 +362,7 @@ instead of <code class="docutils literal"><span class="pre">5/20</span></code>.<
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_24_0.png" src="../_images/basics_24_0.png" />
+<img alt="../_images/basics_25_0.png" src="../_images/basics_25_0.png" />
 <p>Or, we could use the <code class="docutils literal"><span class="pre">ul_idx</span></code> parameter to tell <code class="docutils literal"><span class="pre">pygridgen</span></code> the
 index of the coordinate of the upper left corner our boundary. For this
 example, the upper left coordinates are the 8th items in their arrays,
@@ -375,7 +377,7 @@ so the index is <code class="docutils literal"><span class="pre">7</span></code>
 <span class="n">plot_grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_26_0.png" src="../_images/basics_26_0.png" />
+<img alt="../_images/basics_27_0.png" src="../_images/basics_27_0.png" />
 </div>
 <div class="section" id="on-the-upper-left-index-parameter">
 <h2>On the upper left index parameter<a class="headerlink" href="#on-the-upper-left-index-parameter" title="Permalink to this headline">¶</a></h2>
@@ -400,7 +402,7 @@ effects.</p>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&#39;upper left index = {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
 </pre></div>
 </div>
-<img alt="../_images/basics_28_0.png" src="../_images/basics_28_0.png" />
+<img alt="../_images/basics_29_0.png" src="../_images/basics_29_0.png" />
 </div>
 </div>
 
