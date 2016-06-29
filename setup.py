@@ -13,7 +13,7 @@ Development Status :: beta
 Environment :: Console
 Intended Audience :: Science/Research
 Intended Audience :: Developers
-License :: "BSD 3-clause"
+License :: "MIT"
 Operating System :: OS Independent
 Programming Language :: Python
 Topic :: Scientific/Engineering
@@ -32,7 +32,7 @@ setup(
     author_email="hetland@tamu.edu",
     url="http://github.com/hetland/pygridgen",
     packages=find_packages(exclude=[]),
-    license="BSD 3-clause",
+    license="MIT",
     platforms="Python 2.7, 3.4, 3.5 and later.",
     ext_package='pygridgen',
     classifiers=classifiers.split("\n"),
