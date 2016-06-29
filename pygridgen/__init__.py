@@ -1,5 +1,5 @@
 # encoding: utf-8
-'''
+"""
 PYGRIDGEN is a tool for building curvilinear grids.
 
 PYGRIDGEN is based on Pavel Sakov's gridgen c-library, with python capabilities
@@ -10,13 +10,17 @@ used for making grids.
 
 Released under an MIT license.
 
-'''
+"""
+
 
 from .grid import *
-from .csa import *
-from .boundary_interactor import *
 
-__authors__ = ['Robert Hetland <hetland@tamu.edu>',
-               'Rich Signell <rsignell@gmail.com']
+from .tests import test
 
-__version__ = '0.1.0'
+__authors__ = [
+    'Robert Hetland <hetland@tamu.edu>',
+    'Rich Signell <rsignell@gmail.com',
+    'Paul Hobson <phobson@geosyntec.com>'
+]
+
+__version__ = '0.2.dev'
