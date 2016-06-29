@@ -7,7 +7,7 @@ except ImportError:
     from mpl_toolkits.basemap import pyproj
 
 import numpy.testing as nptest
-import nose.tools as nt
+import pytest
 
 import pygridgen
 
@@ -27,7 +27,6 @@ class _gridMixin(object):
         'autogen': True
     }
 
-    @nt.nottest
     def make_grid(self):
         grid = pygridgen.Gridgen(self.x, self.y, self.beta, self.shape,
                                  **self.options)
@@ -35,111 +34,131 @@ class _gridMixin(object):
         return grid
 
     def test_ny(self):
-        nt.assert_true(hasattr(self.grid, 'ny'))
-        nt.assert_equal(self.grid.ny, self.shape[0])
+        assert self.grid.ny == self.shape[0]
 
     def test_nx(self):
-        nt.assert_true(hasattr(self.grid, 'nx'))
-        nt.assert_equal(self.grid.nx, self.shape[1])
+        assert self.grid.nx == self.shape[1]
 
     def test_nnodes(self):
-        nt.assert_true(hasattr(self.grid, 'nnodes'))
-        nt.assert_equal(self.grid.nnodes, self.options['nnodes'])
+        assert self.grid.nnodes == self.options['nnodes']
 
     def test_precision(self):
-        nt.assert_true(hasattr(self.grid, 'precision'))
-        nt.assert_equal(self.grid.precision, self.options['precision'])
+        assert self.grid.precision == self.options['precision']
 
     def test_nppe(self):
-        nt.assert_true(hasattr(self.grid, 'nppe'))
-        nt.assert_equal(self.grid.nppe, self.options['nppe'])
+        assert self.grid.nppe == self.options['nppe']
 
     def test_newton(self):
-        nt.assert_true(hasattr(self.grid, 'newton'))
-        nt.assert_equal(self.grid.newton, self.options['newton'])
+        assert self.grid.newton == self.options['newton']
 
     def test_thin(self):
-        nt.assert_true(hasattr(self.grid, 'thin'))
-        nt.assert_equal(self.grid.thin, self.options['thin'])
+        assert self.grid.thin == self.options['thin']
 
     def test_checksimplepoly(self):
-        nt.assert_true(hasattr(self.grid, 'checksimplepoly'))
-        nt.assert_equal(self.grid.checksimplepoly, self.options['checksimplepoly'])
+        assert self.grid.checksimplepoly == self.options['checksimplepoly']
 
     def test_verbose(self):
-        nt.assert_true(hasattr(self.grid, 'verbose'))
-        nt.assert_equal(self.grid.verbose, self.options['verbose'])
+        assert self.grid.verbose == self.options['verbose']
 
     def test_x(self):
-        nt.assert_true(hasattr(self.grid, 'x'))
-        nptest.assert_array_almost_equal(self.grid.x, self.known_x, decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.x,
+            self.known_x,
+            decimal=2
+        )
 
     def test_y(self):
-        nt.assert_true(hasattr(self.grid, 'y'))
-        nptest.assert_array_almost_equal(self.grid.y, self.known_y, decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.y,
+            self.known_y,
+            decimal=2
+        )
 
     def test_x_vert(self):
-        nt.assert_true(hasattr(self.grid, 'x_vert'))
-        nptest.assert_array_almost_equal(self.grid.x_vert, self.known_x,
-                                         decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.x_vert,
+            self.known_x,
+            decimal=2
+        )
 
     def test_y_vert(self):
-        nt.assert_true(hasattr(self.grid, 'y_vert'))
-        nptest.assert_array_almost_equal(self.grid.y_vert, self.known_y,
-                                         decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.y_vert,
+            self.known_y,
+            decimal=2
+        )
 
     def test_x_psi(self):
-        nt.assert_true(hasattr(self.grid, 'x_psi'))
-        nptest.assert_array_almost_equal(self.grid.x_psi, self.known_x_psi,
-                                         decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.x_psi,
+            self.known_x_psi,
+            decimal=2
+        )
 
     def test_y_psi(self):
-        nt.assert_true(hasattr(self.grid, 'y_psi'))
-        nptest.assert_array_almost_equal(self.grid.y_psi, self.known_y_psi,
-                                         decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.y_psi,
+            self.known_y_psi,
+            decimal=2
+        )
 
     def test_x_rho(self):
-        nt.assert_true(hasattr(self.grid, 'x_rho'))
-        nptest.assert_array_almost_equal(self.grid.x_rho, self.known_x_rho,
-                                         decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.x_rho,
+            self.known_x_rho,
+            decimal=2
+        )
 
     def test_y_rho(self):
-        nt.assert_true(hasattr(self.grid, 'y_rho'))
-        nptest.assert_array_almost_equal(self.grid.y_rho, self.known_y_rho,
-                                         decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.y_rho,
+            self.known_y_rho,
+            decimal=2
+        )
 
     def test_x_u(self):
-        nt.assert_true(hasattr(self.grid, 'x_u'))
-        nptest.assert_array_almost_equal(self.grid.x_u, self.known_x_u,
-                                         decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.x_u,
+            self.known_x_u,
+            decimal=2
+        )
 
     def test_y_u(self):
-        nt.assert_true(hasattr(self.grid, 'y_u'))
-        nptest.assert_array_almost_equal(self.grid.y_u, self.known_y_u,
-                                         decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.y_u,
+            self.known_y_u,
+            decimal=2
+        )
 
     def test_x_v(self):
-        nt.assert_true(hasattr(self.grid, 'x_v'))
-        nptest.assert_array_almost_equal(self.grid.x_v, self.known_x_v,
-                                         decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.x_v,
+            self.known_x_v,
+            decimal=2
+        )
 
     def test_y_v(self):
-        nt.assert_true(hasattr(self.grid, 'y_v'))
-        nptest.assert_array_almost_equal(self.grid.y_v, self.known_y_v,
-                                         decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.y_v,
+            self.known_y_v,
+            decimal=2
+        )
 
     def test_xbry(self):
-        nt.assert_true(hasattr(self.grid, 'xbry'))
-        nptest.assert_array_almost_equal(self.grid.xbry, self.x,
-                                         decimal=2)
-
+        nptest.assert_array_almost_equal(
+            self.grid.xbry,
+            self.x,
+            decimal=2
+        )
     def test_ybry(self):
-        nt.assert_true(hasattr(self.grid, 'ybry'))
-        nptest.assert_array_almost_equal(self.grid.ybry, self.y,
-                                         decimal=2)
+        nptest.assert_array_almost_equal(
+            self.grid.ybry,
+            self.y,
+            decimal=2
+        )
 
 
-class test_Grid_basic(_gridMixin):
+class Test_Grid_basic(_gridMixin):
     def setup(self):
         self.options = self._options.copy()
         self.x = [0.0, 1.0, 2.0, 1.0, 0.0]
@@ -281,14 +300,13 @@ class test_Grid_basic(_gridMixin):
         ])
 
     def test_mask_poylgon(self):
-        nt.assert_true(hasattr(self.grid, 'mask_polygon'))
         self.grid.mask_polygon(self.island)
         nptest.assert_array_almost_equal(
             self.known_mask_rho, self.grid.mask_rho
         )
 
 
-class test_Grid_with_focus(_gridMixin):
+class Test_Grid_with_focus(_gridMixin):
     def setup(self):
         self.options = self._options.copy()
         self.x = [0.0, 1.0, 2.0, 1.0, 0.0]
@@ -412,7 +430,7 @@ class test_Grid_with_focus(_gridMixin):
         ])
 
 
-class test_Grid_with_proj(_gridMixin):
+class Test_Grid_with_proj(_gridMixin):
     def setup(self):
         self.options = self._options.copy()
         self.x = [-122.7, -122.5, -122.1, -121.7, -122.1, -122.3]
@@ -545,7 +563,6 @@ class test_Grid_with_proj(_gridMixin):
 
     def test_xbry(self):
         projx, projy = self.grid.proj(self.x, self.y)
-        nt.assert_true(hasattr(self.grid, 'xbry'))
         nptest.assert_array_almost_equal(
             self.grid.xbry,
             projx,
@@ -554,7 +571,6 @@ class test_Grid_with_proj(_gridMixin):
 
     def test_ybry(self):
         projx, projy = self.grid.proj(self.x, self.y)
-        nt.assert_true(hasattr(self.grid, 'ybry'))
         nptest.assert_array_almost_equal(
             self.grid.ybry,
             projy,
@@ -562,9 +578,8 @@ class test_Grid_with_proj(_gridMixin):
         )
 
 
-class test_Grid_autogenFalse_Called(test_Grid_basic):
+class Test_Grid_autogenFalse_Called(Test_Grid_basic):
 
-    @nt.nottest
     def make_grid(self):
         self.options.update({'autogen': False})
         grid = pygridgen.Gridgen(self.x, self.y, self.beta, self.shape,
@@ -575,7 +590,7 @@ class test_Grid_autogenFalse_Called(test_Grid_basic):
 
 
 
-class test_Grid_regenerate(test_Grid_with_focus):
+class Test_Grid_regenerate(Test_Grid_with_focus):
     '''Tests grid regenerate with tweaks parameters (properties)
 
     Starts off with the same parameters as ``test_Grid_with_focus``, but
@@ -585,7 +600,6 @@ class test_Grid_regenerate(test_Grid_with_focus):
     ``test_Grid_with_focus`` tests are then run.
 
     '''
-    @nt.nottest
     def make_grid(self):
         focus = self.options.pop('focus')
 
