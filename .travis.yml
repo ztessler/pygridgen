@@ -24,7 +24,7 @@ before_install:
 install:
   - conda create --name testenv --yes python=$TRAVIS_PYTHON_VERSION numpy matplotlib docopt requests pyyaml pytest
   - source activate testenv
-  - conda install --yes pyproj gridgen --channel=conda-forge
+  - conda install --yes pyproj gridgen coverage --channel=conda-forge
   - pip install .
   - pip install coveralls
 
