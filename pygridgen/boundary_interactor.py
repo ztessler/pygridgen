@@ -8,8 +8,8 @@ except ImportError:
 
 from copy import deepcopy
 
-import numpy as np
-import matplotlib.pyplot as plt
+import numpy
+from matplotlib import pyplot
 from matplotlib.artist import Artist
 from matplotlib.patches import Polygon, CirclePolygon
 from matplotlib.lines import Line2D
@@ -122,8 +122,8 @@ class BoundaryInteractor(object):  # pragma: no cover
 
             # display coords
             xt, yt = self._poly.get_transform().numerix_x_y(x, y)
-            d = np.sqrt((xt-event.x)**2 + (yt-event.y)**2)
-            indseq = np.nonzero(np.equal(d, np.amin(d)))
+            d = numpy.sqrt((xt-event.x)**2 + (yt-event.y)**2)
+            indseq = numpy.nonzero(numpy.equal(d, numpy.amin(d)))
             ind = indseq[0]
 
             if d[ind]>=self._epsilon:
@@ -132,11 +132,11 @@ class BoundaryInteractor(object):  # pragma: no cover
             return ind
         except:
             # display coords
-            xy = np.asarray(self._poly.xy)
+            xy = numpy.asarray(self._poly.xy)
             xyt = self._poly.get_transform().transform(xy)
             xt, yt = xyt[:, 0], xyt[:, 1]
-            d = np.sqrt((xt-event.x)**2 + (yt-event.y)**2)
-            indseq = np.nonzero(np.equal(d, np.amin(d)))[0]
+            d = numpy.sqrt((xt-event.x)**2 + (yt-event.y)**2)
+            indseq = numpy.nonzero(numpy.equal(d, numpy.amin(d)))[0]
             ind = indseq[0]
 
             if d[ind]>=self._epsilon:
@@ -201,7 +201,7 @@ class BoundaryInteractor(object):  # pragma: no cover
                 s1 = xys[i+1]
                 d = dist_point_to_segment(p, s0, s1)
                 if d<=self._epsilon:
-                    self._poly.xy = np.array(
+                    self._poly.xy = numpy.array(
                         list(self._poly.xy[:i+1]) +
                         [(event.xdata, event.ydata)] +
                         list(self._poly.xy[i+1:]))
@@ -212,7 +212,7 @@ class BoundaryInteractor(object):  # pragma: no cover
             s1 = xys[0]
             d = dist_point_to_segment(p, s0, s1)
             if d<=self._epsilon:
-                self._poly.xy = np.array(
+                self._poly.xy = numpy.array(
                     list(self._poly.xy) +
                     [(event.xdata, event.ydata)])
                 self._line.set_data(zip(*self._poly.xy))
@@ -280,7 +280,7 @@ class BoundaryInteractor(object):  # pragma: no cover
                  **gridgen_options):
 
         if isinstance(x, str):
-            bry_dict = np.load(x)
+            bry_dict = numpy.load(x)
             x = bry_dict['x']
             y = bry_dict['y']
             beta = bry_dict['beta']
@@ -289,7 +289,7 @@ class BoundaryInteractor(object):  # pragma: no cover
             raise ValueError('Boundary must have at least four points.')
 
         if ax is None:
-            ax = plt.gca()
+            ax = pyplot.gca()
 
         self._ax = ax
 
@@ -357,7 +357,7 @@ class BoundaryInteractor(object):  # pragma: no cover
         f.close()
 
     def load_bry(self, bry_file='bry.pickle'):
-        bry_dict = np.load(bry_file)
+        bry_dict = numpy.load(bry_file)
         x = bry_dict['x']
         y = bry_dict['y']
         self._line.set_data(x, y)
@@ -386,23 +386,23 @@ class edit_mask_mesh(object):  # pragma: no cover
     def _on_key(self, event):
         if event.key == 'e':
             self._clicking = not self._clicking
-            plt.title('Editing %s -- click "e" to toggle' % self._clicking)
-            plt.draw()
+            pyplot.title('Editing %s -- click "e" to toggle' % self._clicking)
+            pyplot.draw()
 
     def _on_click(self, event):
         x, y = event.xdata, event.ydata
         if event.button==1 and event.inaxes is not None and self._clicking == True:
             d = (x-self._xc)**2 + (y-self._yc)**2
-            if isinstance(self.xv, np.ma.MaskedArray):
-                idx = np.argwhere(d[~self._xc.mask] == d.min())
+            if isinstance(self.xv, numpy.ma.MaskedArray):
+                idx = numpy.argwhere(d[~self._xc.mask] == d.min())
             else:
-                idx = np.argwhere(d.flatten() == d.min())
+                idx = numpy.argwhere(d.flatten() == d.min())
             self._mask[idx] = float(not self._mask[idx])
-            i, j = np.argwhere(d == d.min())[0]
+            i, j = numpy.argwhere(d == d.min())[0]
             self.mask[i, j] = float(not self.mask[i, j])
             self._pc.set_array(self._mask)
             self._pc.changed()
-            plt.draw()
+            pyplot.draw()
 
     def __init__(self, xv, yv, mask, **kwargs):
         if xv.shape != yv.shape:
@@ -420,19 +420,19 @@ class edit_mask_mesh(object):  # pragma: no cover
         land_color = kwargs.pop('land_color', (0.6, 1.0, 0.6))
         sea_color = kwargs.pop('sea_color', (0.6, 0.6, 1.0))
 
-        cm = plt.matplotlib.colors.ListedColormap([land_color, sea_color],
+        cm = pyplot.matplotlib.colors.ListedColormap([land_color, sea_color],
                                                  name='land/sea')
-        self._pc = plt.pcolor(xv, yv, mask, cmap=cm, vmin=0, vmax=1, **kwargs)
+        self._pc = pyplot.pcolor(xv, yv, mask, cmap=cm, vmin=0, vmax=1, **kwargs)
         self._xc = 0.25*(xv[1:,1:]+xv[1:,:-1]+xv[:-1,1:]+xv[:-1,:-1])
         self._yc = 0.25*(yv[1:,1:]+yv[1:,:-1]+yv[:-1,1:]+yv[:-1,:-1])
 
-        if isinstance(self.xv, np.ma.MaskedArray):
+        if isinstance(self.xv, numpy.ma.MaskedArray):
             self._mask = mask[~self._xc.mask]
         else:
             self._mask = mask.flatten()
 
-        plt.connect('button_press_event', self._on_click)
-        plt.connect('key_press_event', self._on_key)
+        pyplot.connect('button_press_event', self._on_click)
+        pyplot.connect('key_press_event', self._on_key)
         self._clicking = False
-        plt.title('Editing %s -- click "e" to toggle' % self._clicking)
-        plt.draw()
+        pyplot.title('Editing %s -- click "e" to toggle' % self._clicking)
+        pyplot.draw()

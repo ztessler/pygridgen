@@ -9,7 +9,7 @@ import os
 import sys
 import ctypes
 
-import numpy as np
+import numpy
 from matplotlib.path import Path
 
 
@@ -37,9 +37,9 @@ def _approximate_erf(x):
 
     """
 
-    a = -(8 * (np.pi - 3.0) / (3.0 * np.pi * (np.pi - 4.0)))
-    guts = -1 * (x ** 2) * (4.0 / np.pi + a * x * x) / (1.0 + a * x * x)
-    return np.sign(x) * np.sqrt(1.0 - np.exp(guts))
+    a = -(8 * (numpy.pi - 3.0) / (3.0 * numpy.pi * (numpy.pi - 4.0)))
+    guts = -1 * (x ** 2) * (4.0 / numpy.pi + a * x * x) / (1.0 + a * x * x)
+    return numpy.sign(x) * numpy.sqrt(1.0 - numpy.exp(guts))
 
 
 class _FocusPoint(object):
@@ -91,7 +91,7 @@ class _FocusPoint(object):
     def _reposition_point(self, pnt):
         alpha = 1.0 - 1.0 / self.factor
         erf = _approximate_erf((pnt - self.pos) / self.extent)
-        return pnt - 0.5 * (np.sqrt(np.pi) * self.extent * alpha * erf)
+        return pnt - 0.5 * (numpy.sqrt(numpy.pi) * self.extent * alpha * erf)
 
     def _do_focus(self, array):
         f0 = self._reposition_point(0.0)
@@ -99,12 +99,12 @@ class _FocusPoint(object):
         return (self._reposition_point(array) - f0) / (f1 - f0)
 
     def __call__(self, x, y):
-        x = np.asarray(x)
-        y = np.asarray(y)
-        if np.any(x > 1.0) or np.any(x < 0.0):
+        x = numpy.asarray(x)
+        y = numpy.asarray(y)
+        if numpy.any(x > 1.0) or numpy.any(x < 0.0):
             raise ValueError('x must be within the range [0, 1]')
 
-        if np.any(y > 1.0) or np.any(y < 0.0):
+        if numpy.any(y > 1.0) or numpy.any(y < 0.0):
                 raise ValueError('y must be within the range [0, 1]')
 
         if self.axis == 'y':
@@ -146,7 +146,7 @@ class Focus(object):
     >>> foc.add_focus(0.2, axis='x', factor=3.0, extent=0.20)
     >>> foc.add_focus(0.6, axis='y', factor=5.0, extent=0.35)
 
-    >>> x, y = np.mgrid[0:1:3j, 0:1:3j]
+    >>> x, y = numpy.mgrid[0:1:3j, 0:1:3j]
     >>> xf, yf = foc(x, y)
 
     >>> print(xf)
@@ -221,9 +221,9 @@ class CGrid(object):
     --------
     >>> import numpy as np
     >>> import pygridgen
-    >>> x, y = np.mgrid[0.0:7.0, 0.0:8.0]
-    >>> x = np.ma.masked_where((x < 3) & (y < 3), x)
-    >>> y = np.ma.MaskedArray(y, x.mask)
+    >>> x, y = numpy.mgrid[0.0:7.0, 0.0:8.0]
+    >>> x = numpy.ma.masked_where((x < 3) & (y < 3), x)
+    >>> y = numpy.ma.MaskedArray(y, x.mask)
     >>> grd = pygridgen.grid.CGrid(x, y)
     >>> print(grd.x_rho)
     [[-- -- -- 0.5 0.5 0.5 0.5]
@@ -252,15 +252,15 @@ class CGrid(object):
         # subgrid masks
         self._mask_rho = None
 
-        if np.ndim(x) != 2 and np.ndim(y) != 2:
+        if numpy.ndim(x) != 2 and numpy.ndim(y) != 2:
             raise ValueError('x and y must be two dimensional')
 
-        if np.shape(x) != np.shape(y):
+        if numpy.shape(x) != numpy.shape(y):
             raise ValueError('x and y must be the same size.')
 
-        if np.any(np.isnan(x)) or np.any(np.isnan(y)):
-            x = np.ma.masked_where((np.isnan(x)) | (np.isnan(y)), x)
-            y = np.ma.masked_where((np.isnan(x)) | (np.isnan(y)), y)
+        if numpy.any(numpy.isnan(x)) or numpy.any(numpy.isnan(y)):
+            x = numpy.ma.masked_where((numpy.isnan(x)) | (numpy.isnan(y)), x)
+            y = numpy.ma.masked_where((numpy.isnan(x)) | (numpy.isnan(y)), y)
 
         self.x_vert = x
         self.y_vert = y
@@ -315,24 +315,24 @@ class CGrid(object):
         """
         if self._mask_rho is None:
             mask_shape = tuple([n-1 for n in self.x_vert.shape])
-            self._mask_rho = np.ones(mask_shape, dtype='d')
+            self._mask_rho = numpy.ones(mask_shape, dtype='d')
 
             # If maskedarray is given for vertices, modify the mask such that
             # non-existant grid points are masked.  A cell requires all four
             # verticies to be defined as a water point.
-            if isinstance(self.x_vert, np.ma.MaskedArray):
+            if isinstance(self.x_vert, numpy.ma.MaskedArray):
                 mask = (self.x_vert.mask[:-1,:-1] | self.x_vert.mask[1:,:-1] |
                         self.x_vert.mask[:-1,1:] | self.x_vert.mask[1:,1:])
-                self._mask_rho = np.asarray(
-                    ~(~np.bool_(self.mask_rho) | mask),
+                self._mask_rho = numpy.asarray(
+                    ~(~numpy.bool_(self.mask_rho) | mask),
                     dtype='d'
                 )
 
-            if isinstance(self.y_vert, np.ma.MaskedArray):
+            if isinstance(self.y_vert, numpy.ma.MaskedArray):
                 mask = (self.y_vert.mask[:-1,:-1] | self.y_vert.mask[1:,:-1] |
                         self.y_vert.mask[:-1,1:] | self.y_vert.mask[1:,1:])
-                self._mask_rho = np.asarray(
-                    ~(~np.bool_(self.mask_rho) | mask),
+                self._mask_rho = numpy.asarray(
+                    ~(~numpy.bool_(self.mask_rho) | mask),
                     dtype='d'
                 )
 
@@ -417,7 +417,7 @@ class CGrid(object):
         """
         x_temp = 0.5*(self.x_vert[1:, :]+self.x_vert[:-1, :])
         y_temp = 0.5*(self.y_vert[1:, :]+self.y_vert[:-1, :])
-        dx = np.sqrt(np.diff(x_temp, axis=1)**2 + np.diff(y_temp, axis=1)**2)
+        dx = numpy.sqrt(numpy.diff(x_temp, axis=1)**2 + numpy.diff(y_temp, axis=1)**2)
         return dx
 
     @property
@@ -431,7 +431,7 @@ class CGrid(object):
         """
         x_temp = 0.5*(self.x_vert[:, 1:]+self.x_vert[:, :-1])
         y_temp = 0.5*(self.y_vert[:, 1:]+self.y_vert[:, :-1])
-        dy = np.sqrt(np.diff(x_temp, axis=0)**2 + np.diff(y_temp, axis=0)**2)
+        dy = numpy.sqrt(numpy.diff(x_temp, axis=0)**2 + numpy.diff(y_temp, axis=0)**2)
         return dy
 
     @property
@@ -440,36 +440,36 @@ class CGrid(object):
 
     @property
     def dndx(self):
-        if isinstance(self.dy, np.ma.MaskedArray):
-            dndx = np.ma.zeros(self.x_rho.shape, dtype='d')
+        if isinstance(self.dy, numpy.ma.MaskedArray):
+            dndx = numpy.ma.zeros(self.x_rho.shape, dtype='d')
         else:
-            dndx = np.zeros(self.x_rho.shape, dtype='d')
+            dndx = numpy.zeros(self.x_rho.shape, dtype='d')
 
         dndx[1:-1, 1:-1] = 0.5*(self.dy[1:-1, 2:] - self.dy[1:-1, :-2])
         return dndx
 
     @property
     def dmde(self):
-        if isinstance(self.dx, np.ma.MaskedArray):
-            dmde = np.ma.zeros(self.x_rho.shape, dtype='d')
+        if isinstance(self.dx, numpy.ma.MaskedArray):
+            dmde = numpy.ma.zeros(self.x_rho.shape, dtype='d')
         else:
-            dmde = np.zeros(self.x_rho.shape, dtype='d')
+            dmde = numpy.zeros(self.x_rho.shape, dtype='d')
 
         dmde[1:-1, 1:-1] = 0.5*(self.dx[2:, 1:-1] - self.dx[:-2,1 :-1])
         return dmde
 
     @property
     def angle(self):
-        if isinstance(self.x_vert, np.ma.MaskedArray) or \
-           isinstance(self.y_vert, np.ma.MaskedArray):
-            angle = np.ma.zeros(self.x_vert.shape, dtype='d')
+        if isinstance(self.x_vert, numpy.ma.MaskedArray) or \
+           isinstance(self.y_vert, numpy.ma.MaskedArray):
+            angle = numpy.ma.zeros(self.x_vert.shape, dtype='d')
         else:
-            angle = np.zeros(self.x_vert.shape, dtype='d')
+            angle = numpy.zeros(self.x_vert.shape, dtype='d')
 
-        angle_ud = np.arctan2(np.diff(self.y_vert, axis=1),
-                              np.diff(self.x_vert, axis=1))
-        angle_lr = np.arctan2(np.diff(self.y_vert, axis=0),
-                              np.diff(self.x_vert, axis=0)) - (np.pi / 2.0)
+        angle_ud = numpy.arctan2(numpy.diff(self.y_vert, axis=1),
+                              numpy.diff(self.x_vert, axis=1))
+        angle_lr = numpy.arctan2(numpy.diff(self.y_vert, axis=0),
+                              numpy.diff(self.x_vert, axis=0)) - (numpy.pi / 2.0)
 
         # domain center
         angle[1:-1, 1:-1] = 0.25 * (
@@ -502,9 +502,9 @@ class CGrid(object):
 
     @property
     def angle_rho(self):
-        angle_rho = np.arctan2(
-            np.diff(0.5 * (self.y_vert[1:, :] + self.y_vert[:-1, :])),
-            np.diff(0.5 * (self.x_vert[1:, :] + self.x_vert[:-1, :]))
+        angle_rho = numpy.arctan2(
+            numpy.diff(0.5 * (self.y_vert[1:, :] + self.y_vert[:-1, :])),
+            numpy.diff(0.5 * (self.x_vert[1:, :] + self.x_vert[:-1, :]))
         )
 
         return angle_rho
@@ -516,32 +516,32 @@ class CGrid(object):
         """
         z = self.x_vert + 1j*self.y_vert
 
-        du = np.diff(z, axis=1)
+        du = numpy.diff(z, axis=1)
         du = (du / abs(du))[:-1 ,:]
-        dv = np.diff(z, axis=0)
+        dv = numpy.diff(z, axis=0)
         dv = (dv / abs(dv))[:, :-1]
-        ang1 = np.arccos(du.real*dv.real + du.imag*dv.imag)
+        ang1 = numpy.arccos(du.real*dv.real + du.imag*dv.imag)
 
-        du = np.diff(z, axis=1)
+        du = numpy.diff(z, axis=1)
         du = (du / abs(du))[1:, :]
-        dv = np.diff(z, axis=0)
+        dv = numpy.diff(z, axis=0)
         dv = (dv / abs(dv))[:, :-1]
-        ang2 = np.arccos(du.real*dv.real + du.imag*dv.imag)
+        ang2 = numpy.arccos(du.real*dv.real + du.imag*dv.imag)
 
-        du = np.diff(z, axis=1)
+        du = numpy.diff(z, axis=1)
         du = (du / abs(du))[:-1, :]
-        dv = np.diff(z, axis=0)
+        dv = numpy.diff(z, axis=0)
         dv = (dv / abs(dv))[:, 1:]
-        ang3 = np.arccos(du.real*dv.real + du.imag*dv.imag)
+        ang3 = numpy.arccos(du.real*dv.real + du.imag*dv.imag)
 
-        du = np.diff(z, axis=1)
+        du = numpy.diff(z, axis=1)
         du = (du / abs(du))[1:, :]
-        dv = np.diff(z, axis=0)
+        dv = numpy.diff(z, axis=0)
         dv = (dv / abs(dv))[:, 1:]
-        ang4 = np.arccos(du.real*dv.real + du.imag*dv.imag)
+        ang4 = numpy.arccos(du.real*dv.real + du.imag*dv.imag)
 
-        ang = np.mean([abs(ang1), abs(ang2), abs(ang3), abs(ang4)], axis=0)
-        ang = (ang - np.pi/2.0)
+        ang = numpy.mean([abs(ang1), abs(ang2), abs(ang3), abs(ang4)], axis=0)
+        ang = (ang - numpy.pi/2.0)
         return ang
 
     def calculate_orthogonality(self):
@@ -573,7 +573,7 @@ class CGrid(object):
 
         """
 
-        polyverts = np.asarray(polyverts)
+        polyverts = numpy.asarray(polyverts)
         if polyverts.ndim != 2:
             raise ValueError('polyverts must be a 2D array, or a '
                              'similar sequence')
@@ -586,10 +586,10 @@ class CGrid(object):
 
         mask = self.mask_rho.copy()
         inside = _points_inside_poly(
-            np.vstack([self.x_rho.flatten(), self.y_rho.flatten()]).T,
+            numpy.vstack([self.x_rho.flatten(), self.y_rho.flatten()]).T,
             polyverts
         )
-        if np.any(inside):
+        if numpy.any(inside):
             mask.flat[inside] = mask_value
 
         self.mask_rho = mask
@@ -648,7 +648,7 @@ class CGrid_geo(CGrid):
                                                inverse=True)
 
         # coriolis frequency
-        self.f = 2.0 * 7.29e-5 * np.cos(self.lat_rho * np.pi / 180.0)
+        self.f = 2.0 * 7.29e-5 * numpy.cos(self.lat_rho * numpy.pi / 180.0)
 
     @property
     def dx(self):
@@ -659,7 +659,7 @@ class CGrid_geo(CGrid):
         else:
             x_temp = 0.5*(self.x_vert[1:, :]+self.x_vert[:-1, :])
             y_temp = 0.5*(self.y_vert[1:, :]+self.y_vert[:-1, :])
-            dx = np.sqrt(np.diff(x_temp, axis=1)**2 + np.diff(y_temp, axis=1)**2)
+            dx = numpy.sqrt(numpy.diff(x_temp, axis=1)**2 + numpy.diff(y_temp, axis=1)**2)
             return dx
 
     @property
@@ -671,7 +671,7 @@ class CGrid_geo(CGrid):
         else:
             x_temp = 0.5*(self.x_vert[:, 1:]+self.x_vert[:, :-1])
             y_temp = 0.5*(self.y_vert[:, 1:]+self.y_vert[:, :-1])
-            dy = np.sqrt(np.diff(x_temp, axis=0)**2 + np.diff(y_temp, axis=0)**2)
+            dy = numpy.sqrt(numpy.diff(x_temp, axis=0)**2 + numpy.diff(y_temp, axis=0)**2)
             return dy
 
     @property
@@ -791,7 +791,7 @@ class Gridgen(CGrid):
 
         for name, path in libgridgen_paths:
             try:
-                self._libgridgen = np.ctypeslib.load_library(name, path)
+                self._libgridgen = numpy.ctypeslib.load_library(name, path)
                 break
             except OSError:
                 pass
@@ -809,15 +809,15 @@ class Gridgen(CGrid):
         self._libgridgen.gridmap_build.restype = ctypes.c_void_p
 
         # store the boundary, reproject if possible
-        self.xbry = np.asarray(xbry, dtype='d')
-        self.ybry = np.asarray(ybry, dtype='d')
+        self.xbry = numpy.asarray(xbry, dtype='d')
+        self.ybry = numpy.asarray(ybry, dtype='d')
         self.proj = proj
         if self.proj is not None:
             self.xbry, self.ybry = proj(self.xbry, self.ybry)
 
         # store and check the beta parameter
-        self.beta = np.asarray(beta, dtype='d')
-        if not np.isclose(self.beta.sum(), 4.0):
+        self.beta = numpy.asarray(beta, dtype='d')
+        if not numpy.isclose(self.beta.sum(), 4.0):
             raise ValueError('sum of beta must be 4.0')
 
         # properties
@@ -933,7 +933,7 @@ class Gridgen(CGrid):
             xgrid = ctypes.POINTER(ctypes.c_double)()
             ygrid = ctypes.POINTER(ctypes.c_double)()
         else:
-            y, x =  np.mgrid[0:1:self.ny*1j, 0:1:self.nx*1j]
+            y, x =  numpy.mgrid[0:1:self.ny*1j, 0:1:self.nx*1j]
             xgrid, ygrid = self.focus(x, y)
             ngrid = ctypes.c_int(xgrid.size)
             xgrid = (ctypes.c_double * xgrid.size)(*xgrid.flatten())
@@ -967,18 +967,18 @@ class Gridgen(CGrid):
 
         # x-positions
         x = self._libgridgen.gridnodes_getx(self._gn)
-        x = np.asarray([x[0][i] for i in range(self.ny*self.nx)])
+        x = numpy.asarray([x[0][i] for i in range(self.ny*self.nx)])
         x.shape = (self.ny, self.nx)
 
         # y-positions
         y = self._libgridgen.gridnodes_gety(self._gn)
-        y = np.asarray([y[0][i] for i in range(self.ny*self.nx)])
+        y = numpy.asarray([y[0][i] for i in range(self.ny*self.nx)])
         y.shape = (self.ny, self.nx)
 
         # mask out invalid values
-        if np.any(np.isnan(x)) or np.any(np.isnan(y)):
-            x = np.ma.masked_where(np.isnan(x), x)
-            y = np.ma.masked_where(np.isnan(y), y)
+        if numpy.any(numpy.isnan(x)) or numpy.any(numpy.isnan(y)):
+            x = numpy.ma.masked_where(numpy.isnan(x), x)
+            y = numpy.ma.masked_where(numpy.isnan(y), y)
 
         super(Gridgen, self).__init__(x, y)
 
@@ -996,29 +996,29 @@ def rho_to_vert(xr, yr, pm, pn, ang):  # pragma: no cover
     theta = 0.5*(ang[:-1,-1]+ang[1:,-1])
     dx = 0.5*(1.0/pm[:-1,-1]+1.0/pm[1:,-1])
     dy = 0.5*(1.0/pn[:-1,-1]+1.0/pn[1:,-1])
-    x[1:-1,-1] = x[1:-1,-2] + dx*np.cos(theta)
-    y[1:-1,-1] = y[1:-1,-2] + dx*np.sin(theta)
+    x[1:-1,-1] = x[1:-1,-2] + dx*numpy.cos(theta)
+    y[1:-1,-1] = y[1:-1,-2] + dx*numpy.sin(theta)
 
     # west side
     theta = 0.5*(ang[:-1,0]+ang[1:,0])
     dx = 0.5*(1.0/pm[:-1,0]+1.0/pm[1:,0])
     dy = 0.5*(1.0/pn[:-1,0]+1.0/pn[1:,0])
-    x[1:-1,0] = x[1:-1,1] - dx*np.cos(theta)
-    y[1:-1,0] = y[1:-1,1] - dx*np.sin(theta)
+    x[1:-1,0] = x[1:-1,1] - dx*numpy.cos(theta)
+    y[1:-1,0] = y[1:-1,1] - dx*numpy.sin(theta)
 
     # north side
     theta = 0.5*(ang[-1,:-1]+ang[-1,1:])
     dx = 0.5*(1.0/pm[-1,:-1]+1.0/pm[-1,1:])
     dy = 0.5*(1.0/pn[-1,:-1]+1.0/pn[-1,1:])
-    x[-1,1:-1] = x[-2,1:-1] - dy*np.sin(theta)
-    y[-1,1:-1] = y[-2,1:-1] + dy*np.cos(theta)
+    x[-1,1:-1] = x[-2,1:-1] - dy*numpy.sin(theta)
+    y[-1,1:-1] = y[-2,1:-1] + dy*numpy.cos(theta)
 
     # here we are now going to the south side..
     theta = 0.5*(ang[0,:-1]+ang[0,1:])
     dx = 0.5*(1.0/pm[0,:-1]+1.0/pm[0,1:])
     dy = 0.5*(1.0/pn[0,:-1]+1.0/pn[0,1:])
-    x[0,1:-1] = x[1,1:-1] + dy*np.sin(theta)
-    y[0,1:-1] = y[1,1:-1] - dy*np.cos(theta)
+    x[0,1:-1] = x[1,1:-1] + dy*numpy.sin(theta)
+    y[0,1:-1] = y[1,1:-1] - dy*numpy.cos(theta)
 
     #Corners
     x[0,0] = 4.0*xr[0,0]-x[1,0]-x[0,1]-x[1,1]
@@ -1050,11 +1050,11 @@ def uvp_masks(rmask):  # pragma: no cover
         masks at u-, v-, and psi-points
 
     """
-    rmask = np.asarray(rmask)
+    rmask = numpy.asarray(rmask)
     if rmask.ndim != 2:
         raise ValueError('rmask must be a 2D array')
 
-    if not np.all((rmask == 0) | (rmask ==1 )):
+    if not numpy.all((rmask == 0) | (rmask ==1 )):
         raise ValueError('rmask array must contain only ones and zeros.')
 
     umask = rmask[:, :-1] * rmask[:, 1:]

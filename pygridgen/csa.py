@@ -4,8 +4,8 @@ import site
 import ctypes
 from pkg_resources import resource_filename
 
-import numpy as np
-import matplotlib.pyplot as plt
+import numpy
+from matplotlib import pyplot
 
 
 class csa(object):
@@ -46,13 +46,13 @@ class csa(object):
     Examples
     --------
     >>> import csa
-    >>> xin = np.random.randn(10000)
-    >>> yin = np.random.randn(10000)
-    >>> zin = np.sin( xin**2 + yin**2 ) / (xin**2 + yin**2 )
-    >>> xout, yout = np.mgrid[-3:3:10j, -3:3:10j]
+    >>> xin = numpy.random.randn(10000)
+    >>> yin = numpy.random.randn(10000)
+    >>> zin = numpy.sin( xin**2 + yin**2 ) / (xin**2 + yin**2 )
+    >>> xout, yout = numpy.mgrid[-3:3:10j, -3:3:10j]
     >>> csa_interp = csa.CSA(xin, yin, zin)
     >>> zout = csa_interp(xout, yout)
-    >>> csa_interp.zin =  np.cos( xin + yin**2 )
+    >>> csa_interp.zin =  numpy.cos( xin + yin**2 )
     >>> zout = csa_interp
     >>> print(zout)
 
@@ -60,16 +60,16 @@ class csa(object):
 
     try:
         path = os.path.dirname(resource_filename('pygridgen', '_csa.so'))
-        _csa = np.ctypeslib.load_library('_csa', path)
+        _csa = numpy.ctypeslib.load_library('_csa', path)
     except OSError:
         path = os.path.join(site.getsitepackages()[0], 'pygridgen')
-        _csa = np.ctypeslib.load_library('_csa', path)
+        _csa = numpy.ctypeslib.load_library('_csa', path)
 
     _csa.csa_approximatepoints2.restype = ctypes.POINTER(ctypes.c_double)
 
     def __init__(self, xin, yin, zin, sigma=None, npmin=3, npmax=40, k=140, nppc=5):
-        self.xin = np.asarray(xin)
-        self.yin = np.asarray(yin)
+        self.xin = numpy.asarray(xin)
+        self.yin = numpy.asarray(yin)
 
         if xin.size != yin.size:
             raise ValueError('xin and yin must have the same number '
@@ -90,7 +90,7 @@ class csa(object):
         return self._zin
     @zin.setter
     def zin(self, value):
-        zin = np.asarray(value)
+        zin = numpy.asarray(value)
         if zin.size != self.xin.size:
             raise ValueError('zin must have the same number of elements as '
                              'xin and yin')
@@ -98,8 +98,8 @@ class csa(object):
 
     def _calculate_points(self, xout, yout):
 
-        xout = np.asarray(xout)
-        yout = np.asarray(yout)
+        xout = numpy.asarray(xout)
+        yout = numpy.asarray(yout)
 
         nin = self.xin.size
         nout = xout.size
@@ -107,7 +107,7 @@ class csa(object):
         if self.sigma is None:
             sigma = ctypes.POINTER(ctypes.c_double)()
         else:
-            sigma = (ctypes.c_double * nin)(*(self.sigma * np.ones_like(self.xin)))
+            sigma = (ctypes.c_double * nin)(*(self.sigma * numpy.ones_like(self.xin)))
 
         zout = None
 
@@ -126,9 +126,9 @@ class csa(object):
              ctypes.c_int(self.nppc)                   #int nppc
         )
 
-        zout = np.asarray([zout[i] for i in range(nout)])
+        zout = numpy.asarray([zout[i] for i in range(nout)])
         zout.shape = xout.shape
-        return np.ma.masked_where(np.isnan(zout), zout)
+        return numpy.ma.masked_where(numpy.isnan(zout), zout)
 
     def __call__(self, xout, yout):
         """
@@ -147,8 +147,8 @@ class csa(object):
 
         """
 
-        xout = np.asarray(xout)
-        yout = np.asarray(yout)
+        xout = numpy.asarray(xout)
+        yout = numpy.asarray(yout)
         return self._calculate_points(xout, yout)
 
     def plot(self, xout, yout, ax=None, mesh_opts=None, scatter_opts=None):
@@ -175,7 +175,7 @@ class csa(object):
         """
 
         if ax is None:
-            fig, ax = plt.subplots()
+            fig, ax = pyplot.subplots()
         else:
             fig = ax.figure
 
@@ -185,7 +185,7 @@ class csa(object):
         if scatter_opts is None:
             scatter_opts = {}
 
-        fig, ax = plt.subplots()
+        fig, ax = pyplot.subplots()
         zout = self._calculate_points(xout, yout)
         ax.pcolormesh(xout, yout, zout, **mesh_opts)
         ax.scatter(self.xin, self.yin, 10, self.zin, **scatter_opts)
@@ -194,23 +194,23 @@ class csa(object):
 
 
 if __name__ == '__main__':
-    xin = np.random.randn(10000)
-    yin = np.random.randn(10000)
-    zin = np.sin( xin**2 + yin**2 ) / (xin**2 + yin**2 )
-    sigma = 0.01 * np.ones_like(xin)
+    xin = numpy.random.randn(10000)
+    yin = numpy.random.randn(10000)
+    zin = numpy.sin( xin**2 + yin**2 ) / (xin**2 + yin**2 )
+    sigma = 0.01 * numpy.ones_like(xin)
 
     print(' ### Set up input data points')
 
-    xout, yout = np.mgrid[-3:3:100j, -3:3:100j]
+    xout, yout = numpy.mgrid[-3:3:100j, -3:3:100j]
 
     csa_interp = CSA(xin, yin, zin)
-    fig, (ax1, ax2) = plt.subplots(ncols=2)
+    fig, (ax1, ax2) = pyplot.subplots(ncols=2)
     csa_interp.plot(xout, yout, ax=ax1, mesh_opts=dict(vmin=-1, vmax=1),
                     scatter_opts=dict(vmin=-1, vmax=1, edgecolors='none'))
 
-    csa_interp.zin = np.cos( xin + yin**2 )
+    csa_interp.zin = numpy.cos( xin + yin**2 )
     csa_interp.plot(xout, yout, ax=ax2, mesh_opts=dict(vmin=-1, vmax=1),
                     scatter_opts=dict(vmin=-1, vmax=1, edgecolors='none'))
 
-    plt.show()
+    pyplot.show()
 
