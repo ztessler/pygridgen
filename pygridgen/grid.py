@@ -627,8 +627,8 @@ class CGrid_geo(CGrid):
     @property
     def dx(self):
         if self.use_gcdist:
-            az1, az2, dx = geod.inv(self.lon[:,1:], self.lat[:,1:],
-                                    self.lon[:,:-1], self.lat[:,:-1])
+            az1, az2, dx = self.geod.inv(self.lon[:,1:], self.lat[:,1:],
+                                         self.lon[:,:-1], self.lat[:,:-1])
             return 0.5 * (dx[1:,:] + dx[:-1,:])
         else:
             x_temp = 0.5*(self.x_vert[1:, :]+self.x_vert[:-1, :])
@@ -639,8 +639,8 @@ class CGrid_geo(CGrid):
     @property
     def dy(self):
         if self.use_gcdist:
-            az1, ax2, dy = geod.inv(self.lon[1:,:], self.lat[1:,:],
-                                    self.lon[:-1,:], self.lat[:-1,:])
+            az1, ax2, dy = self.geod.inv(self.lon[1:,:], self.lat[1:,:],
+                                         self.lon[:-1,:], self.lat[:-1,:])
             return 0.5 * (dy[:,1:] + dy[:,:-1])
         else:
             x_temp = 0.5*(self.x_vert[:, 1:]+self.x_vert[:, :-1])
