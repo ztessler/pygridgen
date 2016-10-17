@@ -624,9 +624,10 @@ class CGrid_geo(CGrid):
         try:
             import pyproj
         except ImportError:
-            from mpl_toolkits.basemap import pyproj
-        else:
-            raise ImportError('pyproj or mpltoolkits-basemap required')
+            try:
+                from mpl_toolkits.basemap import pyproj
+            except:
+                raise ImportError('pyproj or mpltoolkits-basemap required')
 
         x, y = proj(lon, lat)
         self.lon_vert = lon
